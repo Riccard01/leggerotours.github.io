@@ -80,7 +80,7 @@
       this.shadowRoot.innerHTML = `
         <style>
           :host{ --glow-delay:.30s; --glow-dur:.62s; --glow-rgb:0,160,255;
-            display:flex; flex:0 0 220px; width:350px; aspect-ratio:9/16; border-radius:16px; overflow:visible; position:relative;
+            display:flex; flex:0 0 220px; width:300px; aspect-ratio:9/16; border-radius:16px; overflow:visible; position:relative;
             transform:scale(var(--s,1)); transition:transform .24s cubic-bezier(.2,.8,.2,1); background:#0b1220; color:#fff; font-family:system-ui,sans-serif;
             box-shadow:0 10px 30px rgba(0,0,0,.35); }
           :host::before{ content:""; position:absolute; inset:0; border-radius:inherit; pointer-events:none; z-index:0; opacity:0; transform:scale(.9);
