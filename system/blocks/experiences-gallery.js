@@ -18,6 +18,7 @@
             gap: var(--gap, 32px);
             padding: var(--pad, 16px);
             width: 100%;
+            touch-action: pan-x;
     }
 
 
@@ -46,6 +47,7 @@
           :host > * {
             flex: 0 0 auto;
             scroll-snap-align: center;
+            scroll-snap-stop: always;  
           }
             .spacer{ 
   flex: 0 0 max(8px, calc(50% - var(--peek, 110px)));
