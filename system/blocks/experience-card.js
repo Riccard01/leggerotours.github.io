@@ -37,6 +37,10 @@
       this.shadowRoot.innerHTML = `
         <style>
           :host{
+            /* controlli glow */
+            --glow-dur:.62s;
+            --glow-rgb:0,160,255;
+
             inline-size: var(--card-w, 220px);
             display:flex; aspect-ratio:9/16; border-radius:16px;
             position:relative; overflow:visible;
@@ -59,17 +63,40 @@
             :host([data-active]){ transform: scale(1.08); }
           }
 
+          /* === Glow stile review-card: visibile soprattutto in basso, niente mask, z-index sopra agli sfondi === */
           :host::before{
-            content:""; position:absolute; inset:0; border-radius:inherit; pointer-events:none; z-index:0;
-            opacity:0; transform:scale(.9); box-shadow:0 0 0 0 rgba(var(--glow-rgb),0);
-            transition:opacity var(--glow-dur), transform var(--glow-dur), box-shadow var(--glow-dur);
+            content:""; position:absolute; inset:0; border-radius:inherit; pointer-events:none;
+            /* sopra .bg/overlay/feather (z=0/2), sotto contenuti (z=5) e outline (z=6) */
+            z-index:3;
+            opacity:0; transform:scale(.9);
+            /* gradient interno + glow esterno verso il basso + un filo dentro */
+            background:
+              radial-gradient(82% 72% at 50% 106%, rgba(var(--glow-rgb),.34) 0%, rgba(var(--glow-rgb),.16) 40%, rgba(0,0,0,0) 70%);
+            box-shadow:
+              0 28px 56px -16px rgba(var(--glow-rgb), .55),
+              0 0 0 1.5px       rgba(var(--glow-rgb), .40),
+              inset 0 -14px 28px     rgba(var(--glow-rgb), .28);
+            transition:
+              opacity var(--glow-dur),
+              transform var(--glow-dur),
+              box-shadow var(--glow-dur),
+              background var(--glow-dur);
           }
           :host([data-active])::before{
             opacity:1; transform:scale(1);
-            box-shadow:0 16px 44px rgba(var(--glow-rgb),.42),0 0 0 2px rgba(var(--glow-rgb),.48),0 0 110px 26px rgba(var(--glow-rgb),.68);
+            background:
+              radial-gradient(86% 76% at 50% 109%, rgba(var(--glow-rgb),.40) 0%, rgba(var(--glow-rgb),.20) 42%, rgba(0,0,0,0) 72%);
+            box-shadow:
+              0 34px 70px -18px rgba(var(--glow-rgb), .60),
+              0 0 0 1.5px       rgba(var(--glow-rgb), .44),
+              inset 0 -16px 32px     rgba(var(--glow-rgb), .32);
           }
-          :host::after{ content:""; position:absolute; inset:0; border-radius:inherit; outline:3px solid rgba(255,255,255,.6);
-            outline-offset:-3px; mix-blend-mode:overlay; pointer-events:none; z-index:6; }
+
+          /* Outline */
+          :host::after{
+            content:""; position:absolute; inset:0; border-radius:inherit; outline:3px solid rgba(255,255,255,.6);
+            outline-offset:-3px; mix-blend-mode:overlay; pointer-events:none; z-index:6;
+          }
 
           .clip{ position:absolute; inset:0; overflow:hidden; border-radius:inherit; }
           .shine{ position:absolute; inset:0; border-radius:inherit; pointer-events:none; z-index:12; }
