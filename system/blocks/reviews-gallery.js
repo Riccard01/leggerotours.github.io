@@ -24,6 +24,7 @@
             -webkit-overflow-scrolling:touch;
             scroll-snap-type:x mandatory;
             padding-block:24px;
+            touch-action: pan-x;
           }
           :host([data-ready="true"]){ opacity:1; }
           :host::-webkit-scrollbar{ display:none; }
@@ -40,7 +41,8 @@
 
           .row > review-card{
             flex:0 0 auto;
-            scroll-snap-align:center;
+            scroll-snap-align: center;
+            scroll-snap-stop: always; 
             position:relative;
             transition:
               transform .35s cubic-bezier(.2,.8,.2,1),
