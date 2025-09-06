@@ -1,4 +1,4 @@
-// /system/blocks/booking-ticket.js  — Ticket Web Component (stile Leggero + ds-button)
+// /system/blocks/booking-ticket.js  — Ticket Web Component (spin 3D on mount + glow subito dopo)
 (() => {
   if (customElements.get('booking-ticket')) return;
 
@@ -24,8 +24,8 @@
         price: 0,
         boat: 'Leggera',
         snacks: [],
-        // startLocal: Date (costruita da start-iso | (date+time))
-        durationMin: 120
+        durationMin: 120,
+        startLocal: null,
       };
     }
 
@@ -43,16 +43,11 @@
       this._updateUI();
     }
 
-    // Public API: set/get value as object
+    // API
     get value(){ return structuredClone(this._data); }
-    set value(v){
-      Object.assign(this._data, v || {});
-      this._updateUI();
-    }
+    set value(v){ Object.assign(this._data, v || {}); this._updateUI(); }
 
-    /* -------------------- INTERNALS -------------------- */
-
-    _qs(sel){ return this.shadowRoot.querySelector(sel); }
+    _qs(s){ return this.shadowRoot.querySelector(s); }
 
     _readAll(){
       const g = (n, d='') => this.getAttribute(n) ?? d;
@@ -65,56 +60,49 @@
       this._data.cancellable = this.hasAttribute('cancellable') ? this.getAttribute('cancellable') !== 'false' : this._data.cancellable;
       this._data.price       = +g('price', this._data.price);
       this._data.boat        = g('boat', this._data.boat);
+
       const snacksRaw        = g('snacks','');
       this._data.snacks      = snacksRaw ? snacksRaw.split(',').map(s => s.trim()).filter(Boolean) : (this._data.snacks || []);
 
-      // Date/Time
-      const startIso = g('start-iso','').trim();
-      if (startIso) {
-        const d = new Date(startIso);
+      // startLocal
+      const iso = g('start-iso','').trim();
+      if (iso) {
+        const d = new Date(iso);
         if (!isNaN(d)) this._data.startLocal = d;
       } else {
-        const date = g('date','').trim(); // es. 2025-10-12
-        const time = g('time','').trim(); // es. 18:30
-        if (date && time) {
+        const date = g('date','').trim(); // YYYY-MM-DD
+        const time = g('time','').trim(); // HH:MM
+        if (date && time){
           const [Y,M,D] = date.split('-').map(Number);
-          const [h,m]   = time.split(':').map(Number);
+          const [h,m] = time.split(':').map(Number);
           const d = new Date(Y, (M||1)-1, D||1, h||0, m||0);
           if (!isNaN(d)) this._data.startLocal = d;
         }
       }
-      if (!this._data.startLocal) {
-        // fallback: oggi + 2 giorni alle 18:30
-        const d = new Date();
-        d.setDate(d.getDate()+2); d.setHours(18,30,0,0);
+      if (!this._data.startLocal){
+        const d = new Date(); d.setDate(d.getDate()+2); d.setHours(18,30,0,0);
         this._data.startLocal = d;
       }
 
-      // Durata
       const dm = +g('duration-min', this._data.durationMin);
       this._data.durationMin = Number.isFinite(dm) ? dm : this._data.durationMin;
     }
 
     _bind(){
-      this._qs('#btnShare')   .addEventListener('click', () => this._onShare());
-      this._qs('#btnIcsEvt')  .addEventListener('click', () => this._downloadICS(false));
-      this._qs('#btnIcsTodo') .addEventListener('click', () => this._downloadICS(true));
-      this._qs('#btnPDF')     .addEventListener('click', () => window.print());
+      this._qs('#btnShare')  .addEventListener('click', () => this._onShare());
+      this._qs('#btnIcsEvt') .addEventListener('click', () => this._downloadICS(false));
+      this._qs('#btnIcsTodo').addEventListener('click', () => this._downloadICS(true));
+      this._qs('#btnPDF')    .addEventListener('click', () => window.print());
     }
 
     _updateUI(){
       const d = this._data;
 
-      // Top/header
       this._qs('#code').textContent = '#' + (d.code || 'LT-000000');
-
-      // Colonna sinistra
       this._qs('#title').textContent = d.title || '';
       this._qs('#pax').textContent   = `${d.pax||0} pax`;
-
       this._qs('#avatar').textContent = (d.name||'?').trim().charAt(0).toUpperCase();
       this._qs('#name').textContent   = d.name || '';
-
       this._qs('#porto').textContent  = d.porto || '-';
       this._qs('#boat').textContent   = d.boat || '-';
       this._qs('#snacks').textContent = (d.snacks||[]).join(', ') || '—';
@@ -137,18 +125,16 @@
     }
 
     _toICSDateUTC(dt){
-      // YYYYMMDDTHHMMSSZ
-      const z = new Date(dt.getTime() - dt.getTimezoneOffset()*60000)
+      return new Date(dt.getTime() - dt.getTimezoneOffset()*60000)
         .toISOString().replace(/[-:]/g,'').split('.')[0] + 'Z';
-      return z;
     }
 
     _downloadICS(isTodo){
       const d = this._data;
       const now = new Date();
+
       if (isTodo){
-        // promemoria 2h prima
-        const due = new Date(d.startLocal.getTime() - 2*60*60000);
+        const due = new Date(d.startLocal.getTime() - 2*60*60000); // -2h
         const ics =
 `BEGIN:VCALENDAR
 VERSION:2.0
@@ -215,7 +201,7 @@ Porto: ${d.porto} — ${d.pax} pax`;
       this.shadowRoot.innerHTML = `
         <style>
           :host{
-            /* Theming & sizing */
+            /* Theming & sizing (integra con i tuoi tokens esistenti) */
             --ticket-w: 720px;
             --surface: var(--surface-900, #0b1220);
             --bg: var(--bg-950, #060a16);
@@ -227,6 +213,11 @@ Porto: ${d.porto} — ${d.pax} pax`;
             --edge: #0e1629;
             --glow-rgb: var(--glow-rgb, 0,160,255);
 
+            /* Animazioni entrance+glow */
+            --enter-dur: .6s;                            /* durata spin 3D */
+            --enter-ease: cubic-bezier(.22,.61,.36,1);   /* easing coerente col resto */
+            --glow-in-dur: .24s;                         /* durata accensione glow */
+
             display:block;
             width:min(var(--ticket-w), 96vw);
           }
@@ -236,14 +227,17 @@ Porto: ${d.porto} — ${d.pax} pax`;
             width:100%;
             border-radius:20px;
             background:linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,.00));
-            overflow:hidden;
-            isolation:isolate;
-            box-shadow:
-              0 12px 30px rgba(0,0,0,.35),
-              inset 0 1px 0 rgba(255,255,255,.07);
+            overflow:hidden; isolation:isolate;
+            box-shadow: 0 12px 30px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.07);
+
+            /* Spin 3D su render */
+            transform-style: preserve-3d;
+            backface-visibility: hidden;
+            will-change: transform, opacity;
+            animation: ticket-enter var(--enter-dur) var(--enter-ease) both;
           }
 
-          /* Glow “Leggero” concentrato in basso */
+          /* Glow “Leggero” che parte subito dopo lo spin */
           .ticket::before{
             content:""; position:absolute; inset:0; z-index:-1; border-radius:inherit; pointer-events:none;
             background:
@@ -252,9 +246,11 @@ Porto: ${d.porto} — ${d.pax} pax`;
               0 38px 76px -22px rgba(var(--glow-rgb), .55),
               0 0 0 1.2px rgba(var(--glow-rgb), .35),
               inset 0 -18px 36px rgba(var(--glow-rgb), .25);
-            opacity:.9;
+            opacity:0; transform: scale(.96);
+            animation: glow-enter var(--glow-in-dur) cubic-bezier(.2,.8,.2,1) var(--enter-dur) both; /* delay = durata spin */
           }
 
+          /* Shine decorativo (rimane come prima) */
           .shine{ position:absolute; inset:0; border-radius:inherit; pointer-events:none; mix-blend-mode:overlay; }
           .shine::before{
             content:""; position:absolute; left:-40%; top:-150%; width:180%; height:160%;
@@ -262,6 +258,16 @@ Porto: ${d.porto} — ${d.pax} pax`;
             transform:rotate(18deg);
             animation:shine 2.2s ease-in-out .25s forwards;
             opacity:0;
+          }
+
+          @keyframes ticket-enter{
+            0%   { transform: perspective(1000px) rotateY(-22deg) translateY(8px) scale(.94); opacity:0; }
+            60%  { opacity:1; }
+            100% { transform: perspective(1000px) rotateY(0) translateY(0) scale(1); opacity:1; }
+          }
+          @keyframes glow-enter{
+            0%   { opacity:0; transform: scale(.96); }
+            100% { opacity:.9; transform: scale(1); }
           }
           @keyframes shine{ 0%{top:-150%;opacity:0} 25%{opacity:.85} 55%{top:-10%;opacity:1} 100%{top:150%;opacity:0} }
 
@@ -348,7 +354,7 @@ Porto: ${d.porto} — ${d.pax} pax`;
             background:linear-gradient(180deg,#fff,#a3b8ff); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent;
           }
 
-          /* Actions (DS Button) */
+          /* Actions (usa ds-button) */
           .actions{
             display:flex; flex-wrap:wrap; gap:12px; justify-content:center;
             padding:14px 16px 12px; background:var(--surface);
@@ -356,7 +362,14 @@ Porto: ${d.porto} — ${d.pax} pax`;
           }
           .actions ds-button { --radius: 12px; }
 
-          /* Stampa */
+          /* Preferenze di riduzione movimento */
+          @media (prefers-reduced-motion: reduce){
+            .ticket{ animation:none !important; }
+            .ticket::before{ animation:none !important; opacity:.9; transform:none; }
+            .shine::before{ animation:none !important; }
+          }
+
+          /* Print */
           @media print{
             :host{ width:auto }
             .actions, .shine{ display:none !important; }
