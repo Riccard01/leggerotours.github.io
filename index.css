@@ -14,9 +14,9 @@ section {
     display: flex;
     justify-content: center;
     align-items: center;
+    flex-direction: column;
     position: relative;
     width: 100vw;
-    height: 350px;
     background-color: #13161F;
 }
 
@@ -136,6 +136,7 @@ story-touch-overlay{
   line-height: 1.6;
   max-width: 640px;
   margin: 0 auto;
+  margin-bottom: 2rem;
 }
 
 .reviews-grid {
@@ -147,4 +148,8 @@ story-touch-overlay{
   margin-top: 2rem;
   padding: 0 1rem;
   box-sizing: border-box;
+}
+
+.reviews-section {
+  margin-bottom: -7rem;
 }
