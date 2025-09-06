@@ -139,3 +139,13 @@ story-touch-overlay{
   margin: 0 auto;
 }
 
+.reviews-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+  width: 100%;
+  max-width: 1200px;
+  margin-top: 2rem;
+  padding: 0 1rem;
+  box-sizing: border-box;
+}
