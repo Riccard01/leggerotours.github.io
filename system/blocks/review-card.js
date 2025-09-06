@@ -1,4 +1,4 @@
-// /system/blocks/review-card.js  (no avatar, guards + cleanup)
+// /system/blocks/review-card.js  (glow robusto: z-index sopra overlay, gradient interno + shadow)
 (() => {
   if (customElements.get('review-card')) return;
 
@@ -79,13 +79,41 @@
     _render() {
       this.shadowRoot.innerHTML = `
         <style>
-          :host{ --glow-delay:.30s; --glow-dur:.62s; --glow-rgb:0,160,255;
+          :host{
+            --glow-delay:.30s; --glow-dur:.62s; --glow-rgb:0,160,255;
             display:flex; flex:0 0 220px; width:300px; aspect-ratio:9/16; border-radius:16px; overflow:visible; position:relative;
             transform:scale(var(--s,1)); transition:transform .24s cubic-bezier(.2,.8,.2,1); background:#0b1220; color:#fff; font-family:system-ui,sans-serif;
-            box-shadow:0 10px 30px rgba(0,0,0,.35); }
-          :host::before{ content:""; position:absolute; inset:0; border-radius:inherit; pointer-events:none; z-index:0; opacity:0; transform:scale(.9);
-            box-shadow:0 0 0 0 rgba(var(--glow-rgb),0); transition:opacity var(--glow-dur), transform var(--glow-dur), box-shadow var(--glow-dur); }
-          :host([data-active])::before{ opacity:1; transform:scale(1); box-shadow:0 16px 44px rgba(var(--glow-rgb),.42),0 0 0 2px rgba(var(--glow-rgb),.48),0 0 110px 26px rgba(var(--glow-rgb),.68); }
+            box-shadow:0 10px 30px rgba(0,0,0,.35);
+          }
+
+          /* Glow robusto e sempre visibile (anche dentro la card) */
+          :host::before{
+            content:""; position:absolute; inset:0; border-radius:inherit; pointer-events:none;
+            /* sopra .bg (z=0) e sopra overlay/feather (z=2), sotto contenuti (z=5) e outline (z=8) */
+            z-index:3;
+            opacity:0; transform:scale(.9);
+            /* doppio: gradient interno + shadow esterno verso il basso */
+            background:
+              radial-gradient(80% 70% at 50% 105%, rgba(var(--glow-rgb),.35) 0%, rgba(var(--glow-rgb),.18) 40%, rgba(0,0,0,0) 70%);
+            box-shadow:
+              0 28px 56px -16px rgba(var(--glow-rgb), .55),
+              0 0 0 1.5px       rgba(var(--glow-rgb), .40),
+              inset 0 -14px 28px     rgba(var(--glow-rgb), .28);
+            transition:opacity var(--glow-dur), transform var(--glow-dur), box-shadow var(--glow-dur), background var(--glow-dur);
+          }
+          :host([data-active])::before{
+            opacity:1; transform:scale(1);
+            background:
+              radial-gradient(85% 75% at 50% 108%, rgba(var(--glow-rgb),.40) 0%, rgba(var(--glow-rgb),.20) 42%, rgba(0,0,0,0) 72%);
+            box-shadow:
+              0 34px 70px -18px rgba(var(--glow-rgb), .60),
+              0 0 0 1.5px       rgba(var(--glow-rgb), .44),
+              inset 0 -16px 32px     rgba(var(--glow-rgb), .32);
+          }
+
+          :host::after{
+            content:""; position:absolute; inset:0; border-radius:inherit; outline:2px solid rgba(255,255,255,.45); outline-offset:-3px; mix-blend-mode:overlay; pointer-events:none; z-index:8;
+          }
 
           .bubble{ position:absolute; max-width:72%; top:16px; right:16px; padding:10px 12px; border-radius:14px; background:rgba(255,255,255,.96); color:#0b1220;
             font-size:14px; line-height:1.3; z-index:7; box-shadow:0 8px 24px rgba(0,0,0,.25); transform:translateY(-6px); opacity:0; transition:transform .25s, opacity .25s; }
@@ -102,8 +130,6 @@
           @keyframes blink{ 50%{ opacity:0 } }
 
           .clip{ position:absolute; inset:0; overflow:hidden; border-radius:inherit; }
-          :host::after{ content:""; position:absolute; inset:0; border-radius:inherit; outline:3px solid rgba(255,255,255,.6); outline-offset:-3px; mix-blend-mode:overlay; pointer-events:none; z-index:8; }
-
           .price-badge{ position:absolute; top:-2rem; left:35%; padding:.28rem .6rem; z-index:9; font-size:1rem; letter-spacing:.0375rem; text-transform:uppercase;
             background:linear-gradient(180deg,#FFF 10%,#999 80%); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; opacity:0; transition:opacity .18s; }
           :host([data-active]) .price-badge{ opacity:1; }

@@ -17,7 +17,7 @@
             width:100%;
             /* evitiamo flash di layout: mostriamo quando è centrato */
             opacity:0;
-            transition:opacity .15s ease;
+            transition:opacity .15s ease !important;
             /* scroller */
             overflow-x:auto;
             overflow-y:hidden;
@@ -44,8 +44,8 @@
             scroll-snap-stop: always; 
             position:relative;
             transition:
-              transform .15s cubic-bezier(.2,.8,.2,1),
-              opacity .15s;
+              transform .15s cubic-bezier(.2,.8,.2,1) !important,
+              opacity .15s !important;
             transform: translateY(36px) scale(.9);
             opacity:.8;
             z-index:1;
