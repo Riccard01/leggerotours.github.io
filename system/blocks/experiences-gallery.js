@@ -32,7 +32,7 @@
             padding: var(--pad, 16px);
             box-sizing: border-box;
             width: 100%;
-
+            padding: 4rem 0;
             /* scroller */
             overflow-x: auto;
             overflow-y: hidden;
