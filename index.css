@@ -1,0 +1,141 @@
+body {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    flex-direction: column;
+    padding: 0;
+    margin: 16px;
+    overflow-x: hidden;
+    background-color: #13161F;
+    height: 3000px
+}
+
+section {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    width: 100vw;
+    height: 350px;
+    margin-bottom: 32px;
+    background-color: #13161F;
+}
+
+* {
+  -webkit-tap-highlight-color: transparent; /* mobile highlight */
+  -webkit-touch-callout: none;              /* iOS long-press menu */
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+/* Font di base per tutta la pagina */
+html, body {
+  font-family: var(--font-sans, "Plus Jakarta Sans", system-ui, sans-serif);
+  font-weight: var(--weight-regular, 400);
+  margin: 0;
+  padding: 0;
+}
+
+/* Titoli */
+.title-2xl {
+  font-size: var(--font-4xl, 36px);
+  font-weight: var(--weight-bold, 700);
+  line-height: 1.2;
+  margin: 0 0 1rem 0;
+  color: var(--neutral-50, #fff);
+}
+
+/* Paragrafi grandi */
+.body-lg {
+  font-size: var(--font-lg, 18px);
+  font-weight: var(--weight-regular, 400);
+  line-height: 1.6;
+  margin: 0;
+  color: var(--neutral-200, #e2e8f0);
+}
+
+/* * {
+    border: red 1px solid !important;
+} */
+
+.card-wrap{
+  position: relative;
+  display: inline-block;
+  border-radius: var(--radius-lg,16px);
+  overflow: hidden;               /* 👈 clippa tutto, overlay compreso */
+}
+
+/* opzionale, se vuoi che l’overlay “rispetti” sempre il raggio anche senza overflow */
+story-touch-overlay{
+  border-radius: inherit;
+  /* se ti serve ulteriore sicurezza:
+     clip-path: inset(0 round var(--radius-lg,16px)); */
+}
+.food-step h2.metallic {
+  font-size: 2rem;
+  font-weight: 700;
+  margin: 0;
+
+  background: linear-gradient(180deg, #ffffff 0%, #999999 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+
+}
+
+.food-step {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.food-step p {
+  font-size: 1.2rem;
+  color: var(--neutral-200, #b1b6be);
+  margin: 0;
+}
+
+.wrapper-food-step, .wrapper-reviews {
+  display: flex;
+  width: 100vw;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  padding-top: 2rem;
+  background-color: #13161F;
+}
+.reviews-header, .exp-header {
+  text-align: center;
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+.reviews-title, .exp-title {
+  font-size: 2.5rem; /* adattalo se serve */
+  font-weight: 700;
+  line-height: 1.2;
+  margin-bottom: 1rem;
+
+  /* sfumatura Apple-style */
+  background: linear-gradient(to bottom, #ffffff 0%, #ebebeb 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  color: transparent;
+
+  /* ombra leggera */
+  text-shadow: 0 2px 6px rgba(0,0,0,0.25);
+}
+
+.reviews-subtitle, .exp-subtitle {
+  font-size: 1.125rem;
+  color: #e5e5e5;
+  line-height: 1.6;
+  max-width: 640px;
+  margin: 0 auto;
+}
+

@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Leggero Tours — Progress Form</title>
+
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Petrona:wght@400;700&family=Plus+Jakarta+Sans:wght@400;700&display=swap" rel="stylesheet">
+
+  <!-- Tokens e CSS pagina -->
+  <link rel="stylesheet" href="./system/atoms/tokens.css">
+  <link rel="stylesheet" href="./index.css">
+
+  <!-- Componenti (ordine: dipendenze -> chi li usa) -->
+  <script src="/system/blocks/ds-button.js" defer></script>
+  <script src="/system/blocks/story-badge.js" defer></script>
+  <script src="/system/blocks/experience-card.js" defer></script>
+  <script src="/system/blocks/experiences-gallery.js" defer></script>
+  <script src="/system/blocks/review-card.js" defer></script>
+  <script src="/system/blocks/reviews-gallery.js" defer></script>
+</head>
+<body>
+
+<!-- EXPERIENCES / hero -->
+<section class="exp-section">
+  <div class="background">
+    <div class="container">
+      <header class="exp-header">
+        <h2 class="exp-title">Vitamin SEA</h2>
+        <p class="exp-subtitle">
+          Scegli l’esperienza che ti ispira: baie segrete, tramonti gourmet e
+          rotte pensate per farti vivere il mare in modo semplice, elegante e senza pensieri.
+        </p>
+      </header>
+    </div>
+  </div>
+</section>
+
+
+<!-- La gallery -->
+<experiences-gallery></experiences-gallery>
+
+<!-- REVIEWS -->
+<section class="reviews-section">
+  <div class="background">
+    <div class="container">
+      <header class="reviews-header">
+        <h2 class="reviews-title">Chi è stato Leggero</h2>
+        <p class="reviews-subtitle">
+          Voci di bordo, emozioni vere. Racconti e recensioni dei nostri ospiti
+          dopo una giornata sul mare, raccolte così come le hanno vissute.
+        </p>
+      </header>
+    </div>
+  </div>
+</section>
+
+
+
+<reviews-gallery></reviews-gallery>
+
+
+  <!-- ===================== PROGRESS FORM (unico) ===================== -->
+  <!-- <progress-form id="booking">
+
+
+
+
+      <experience-card
+        id="exp-1"
+        price="€570 per group"
+        image="./assets/images/boccadasse.jpg"
+        title="The Rainbow Tour"
+        description="Esplora luoghi selvaggi e baie segrete, da Punta Chiappa a Portofino."
+        tag="Tutto il giorno"
+        cta="Configura"
+        badge-image="/assets/thumbs/portofino.jpg">
+        <ds-button slot="cta" value="rainbow" variant="with-icon-light" size="md" full>
+          <span slot="text">Configura</span>
+        </ds-button>
+        <story-badge src="/assets/icons/map.svg" label="Scopri programma" size="56" duration="1600">
+          <img slot="1" src="/assets/images/faro.jpg" data-ms="3200">
+          <video slot="2" src="/assets/videos/amerigo.mp4"></video>
+          <video slot="2" src="/assets/videos/gourmet.mp4"></video>
+          <img slot="3" src="/assets/images/me.jpg">
+        </story-badge>
+      </experience-card>
+
+      <experience-card
+        id="exp-2"
+        price="€570 per group"
+        image="./assets/images/portofino.jpg"
+        title="The Rainbow Tour"
+        description="Esplora luoghi selvaggi e baie segrete, da Punta Chiappa a Portofino."
+        tag="Tutto il giorno"
+        cta="Configura"
+        badge-image="/assets/thumbs/portofino.jpg"
+        badge-label="Programma e rotte"
+        badge-desc="Baia segreta + aperitivo">
+        <ds-button slot="cta" value="rainbow-2" variant="with-icon-light" size="md" full>
+          <span slot="text">Configura</span>
+        </ds-button>
+        <story-badge src="/assets/images/camogli.jpg" label="Tappe" size="56" duration="2600"></story-badge>
+      </experience-card>
+
+      <experience-card
+        id="exp-3"
+        price="€390 per group"
+        image="./assets/images/genovese.jpg"
+        title="Gourmet Sunset Cruise"
+        description="Un'esperienza al tramonto con degustazione di piatti tipici."
+        tag="Al tramonto"
+        cta="Configura">
+        <ds-button slot="cta" value="gourmet" variant="with-icon-light" size="md" full>
+          <span slot="text">Configura</span>
+        </ds-button>
+        <story-badge src="/assets/images/camogli.jpg" label="Tappe" size="56" duration="2600"></story-badge>
+      </experience-card>
+
+      <experience-card
+        id="exp-4"
+        price="€250 per group"
+        image="./assets/images/dolphin.jpg"
+        title="Dolphin Watching"
+        description="Avvistamento dei delfini nel loro habitat naturale."
+        tag="Mezza giornata"
+        cta="Configura">
+        <ds-button slot="cta" value="dolphin" variant="with-icon-light" size="md" full>
+          <span slot="text">Configura</span>
+        </ds-button>
+        <story-badge src="/assets/images/camogli.jpg" label="Tappe" size="56" duration="2600"></story-badge>
+      </experience-card>
+
+      <experience-card
+        id="exp-5"
+        price="€1200 per group"
+        image="./assets/images/special.jpg"
+        title="Stella Maris"
+        description="Camogli e San Fruttuoso con aperitivo a bordo."
+        tag="Al tramonto"
+        cta="Configura">
+        <ds-button slot="cta" value="stella-maris" variant="with-icon-light" size="md" full>
+          <span slot="text">Configura</span>
+        </ds-button>
+        <story-badge src="/assets/images/camogli.jpg" label="Tappe" size="56" duration="2600"></story-badge>
+      </experience-card>
+
+      <experience-card
+        id="exp-6"
+        price="€1200 per group"
+        image="./assets/images/fireworks.jpg"
+        title="Recco Fireworks"
+        description="Sentieri panoramici con viste mozzafiato."
+        tag="Mezza giornata"
+        cta="Scopri">
+        <ds-button slot="cta" value="fireworks" variant="with-icon-light" size="md" full>
+          <span slot="text">Configura</span>
+        </ds-button>
+        <story-badge src="/assets/images/camogli.jpg" label="Tappe" size="56" duration="2600"></story-badge>
+      </experience-card>
+
+
+      <boat-card image="./assets/images/leggera.jpg" title="Leggera" description="Sportiva, pronta a solcare la cresta dell'onda." tag="Mezza giornata"></boat-card>
+        <ds-button slot="cta" value="solaris" variant="with-icon-light" size="md" full><span slot="text">Seleziona</span></ds-button>
+      </boat-card>
+
+      <boat-card image="./assets/images/barca2.jpg" title="Solaris" description="Sentieri panoramici con viste mozzafiato." tag="Mezza giornata">
+        <ds-button slot="cta" value="solaris" variant="with-icon-light" size="md" full><span slot="text">Seleziona</span></ds-button>
+      </boat-card>
+
+      <boat-card image="./assets/images/barca3.jpg" title="Anita" description="Sentieri panoramici con viste mozzafiato." tag="Mezza giornata">
+        <ds-button slot="cta" value="anita" variant="with-icon-light" size="md" full><span slot="text">Seleziona</span></ds-button>
+      </boat-card>
+
+      <boat-card image="./assets/images/barca4.jpg" title="Jibjama" description="Sentieri panoramici con viste mozzafiato." tag="Mezza giornata">
+        <ds-button slot="cta" value="jibjama" variant="with-icon-light" size="md" full><span slot="text">Seleziona</span></ds-button>
+      </boat-card>
+
+      <boat-card image="./assets/images/barca5.jpg" title="Julia" description="Sentieri panoramici con viste mozzafiato." tag="Mezza giornata">
+        <ds-button slot="cta" value="julia" variant="with-icon-light" size="md" full><span slot="text">Seleziona</span></ds-button>
+      </boat-card>
+
+
+      <food-card image="./assets/images/melone.jpg" title="Prosciutto e melone" description="Pane tostato con pomodori freschi, aglio, basilico e olio d'oliva." cta="Ordina Ora" tag="Free of charge" diet="haram">
+        <ds-button slot="cta" value="prosciutto-melone" variant="with-icon-light" size="md" full><span slot="text">Seleziona</span></ds-button>
+      </food-card>
+
+      <food-card image="./assets/images/anguria.jpg" title="Insalata di anguria e cipolle" description="Pane tostato con pomodori freschi, aglio, basilico e olio d'oliva." cta="Ordina Ora" tag="Free of charge" diet="halal">
+        <ds-button slot="cta" value="insalata-anguria" variant="with-icon-light" size="md" full><span slot="text">Seleziona</span></ds-button>
+      </food-card>
+
+      <food-card image="./assets/images/couscous.jpg" title="Cous cous di verdure" description="Pane tostato con pomodori freschi, aglio, basilico e olio d'oliva.🌾 = contiene glutine" cta="Ordina Ora" tag="Free of charge" diet="halal">
+        <ds-button slot="cta" value="couscous-verdure" variant="with-icon-light" size="md" full><span slot="text">Seleziona</span></ds-button>
+      </food-card>
+
+      <food-card image="./assets/images/limonementa.jpg" title="Freschezza al limone e menta" description="Pane tostato con pomodori freschi, aglio, basilico e olio d'oliva." cta="Ordina Ora" tag="Free of charge">
+        <ds-button slot="cta" value="limone-menta" variant="with-icon-light" size="md" full><span slot="text">Seleziona</span></ds-button>
+      </food-card>
+
+
+
+      <food-card image="./assets/images/pastel.jpg" title="Pastel de nata" description="Pane tostato con pomodori freschi, aglio, basilico e olio d'oliva." cta="Ordina Ora" tag="Free of charge" diet="haram">
+        <ds-button slot="cta" value="pastel-nata" variant="with-icon-light" size="md" full><span slot="text">Seleziona</span></ds-button>
+      </food-card>
+
+      <food-card image="./assets/images/cornetto.jpg" title="Cornetto" description="Pane tostato con pomodori freschi, aglio, basilico e olio d'oliva." cta="Ordina Ora" tag="Free of charge" diet="halal">
+        <ds-button slot="cta" value="cornetto" variant="with-icon-light" size="md" full><span slot="text">Seleziona</span></ds-button>
+      </food-card>
+
+      <food-card image="./assets/images/focaccia.jpg" title="Focaccia" description="Pane tostato con pomodori freschi, aglio, basilico e olio d'oliva.🌾 = contiene glutine" cta="Ordina Ora" tag="Free of charge" diet="halal">
+        <ds-button slot="cta" value="focaccia" variant="with-icon-light" size="md" full><span slot="text">Seleziona</span></ds-button>
+      </food-card>
+
+
+      <review-card
+        image="./assets/images/florence.jpg"
+        title="Florence"
+        description="Riccardo è una guida esperta, discreta ma calorosa e familiare come un vecchio amico. Ti farà sentire come un locale che vive il sogno italiano per un giorno."
+        cta="Ordina Ora"
+        tag="Free of charge">
+      </review-card>
+
+      <review-card
+        image="./assets/images/lana.jpg"
+        title="Lana"
+        description="And the captain was so nice and flexible with everything
+And the boat was very safe, he had all of the safety equipments ready if anything happened, and he was very careful with everything it was very safe."
+        cta="Ordina Ora"
+        tag="Free of charge">
+      </review-card>
+
+
+      <port-card
+        image="./assets/images/portoantico.jpg"
+        title="Porto Antico"
+        description="Ponte Spinola – punto di pickup per tour in barca"
+        pickup-lat="44.4101"
+        pickup-lng="8.9290">
+        <ds-button slot="cta" value="porto-antico" variant="with-icon-light" size="md" full>
+          <span slot="text">Seleziona</span>
+        </ds-button>
+      </port-card>
+
+      <port-card
+        image="./assets/images/moloumberto.jpg"
+        title="Portofino"
+        description="Molo Umberto I – punto di pickup per tour in barca"
+        pickup-lat="44.302158"
+        pickup-lng="9.210706">
+        <ds-button slot="cta" value="portofino" variant="with-icon-light" size="md" full>
+          <span slot="text">Seleziona</span>
+        </ds-button>
+      </port-card>
+
+  </progress-form> -->
+
+</body>
+</html>

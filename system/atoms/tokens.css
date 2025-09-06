@@ -1,0 +1,108 @@
+/* system/blocks/tokens.css */
+/* Design Tokens: spaziatura, tipografia, colori (contrasto AA/AAA) */
+:root {
+  /* Spacing scale (4px baseline) */
+  --space-0: 0;
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-7: 28px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+
+  /* Radius */
+  --radius-sm: 8px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+
+  /* Typography */
+  --font-sans: "Plus Jakarta Sans", system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  --font-serif: "Petrona", Georgia, serif;
+
+  /* Aliases */
+  --font-body: var(--font-sans);
+  --font-title: var(--font-sans);
+
+  /* Font sizes */
+  --font-xs: 12px;
+  --font-sm: 14px;
+  --font-md: 16px;
+  --font-lg: 18px;
+  --font-xl: 20px;
+  --font-2xl: clamp(22px, 4vw, 28px);
+  --font-3xl: clamp(28px, 6vw, 36px);
+
+  /* Font weights */
+  --weight-regular: 400;
+  --weight-bold: 700;
+  --weight-extrabold: 800;
+
+  /* Palette di base */
+  --brand-600: #2563EB;   /* primario (blue) */
+  --brand-500: #3B82F6;
+  --brand-400: #60A5FA;
+
+  --neutral-950: #0B1220; /* sfondo scuro */
+  --neutral-800: #1F2937;
+  --neutral-700: #334155;
+  --neutral-200: #E2E8F0;
+  --neutral-300: #CBD5E1; /* bordi chiari */
+  --neutral-50:  #F8FAFC; /* sfondo chiaro */
+  --white: #FFFFFF;
+  --black: #000000;
+
+  /* Superfici */
+  --surface-base: var(--neutral-50);
+  --surface-raised: var(--white);
+  --surface-inverse: var(--neutral-950);
+
+  /* Testi (contrast safe) */
+  --text-strong: var(--neutral-950);     /* su sfondo chiaro */
+  --text-body: #2A3342;                  /* su sfondo chiaro */
+  --text-muted: #5B6472;                 /* su sfondo chiaro */
+  --text-on-inverse: var(--white);       /* su sfondo scuro */
+
+  /* Bordi */
+  --border-subtle: var(--neutral-300);
+  --border-on-inverse: rgba(255,255,255,.22);
+
+  /* Ring/Focus */
+  --ring-brand: #93C5FD;
+
+  /* Accents */
+  --success-600: #16A34A;
+  --warning-600: #D97706;
+  --danger-600:  #DC2626;
+
+  /* Ombre leggere (per piccoli elementi, bottoni, chip) */
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.08);
+
+  /* Ombra media (per card semplici o elementi flottanti leggeri) */
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.12);
+
+  /* Ombra standard (per card interattive, modali leggere) */
+  --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.16);
+
+  /* Ombra forte (per card principali, hover, popover) */
+  --shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.20);
+
+  /* Ombra intensa e diffusa (per hero card, focus, modali) */
+  --shadow-xl: 0 12px 24px rgba(0, 0, 0, 0.28);
+
+  /* Ombra ultra profonda (drammatica, da spotlight) */
+  --shadow-xxl: 0 20px 40px rgba(0, 0, 0, 0.35);
+}
+
+/* Utility classes */
+.u-stack > * + * { margin-top: var(--space-4); }
+.u-inline > * + * { margin-left: var(--space-4); }
+
+.u-text-display { font-family: var(--font-title); font-size: var(--font-3xl); font-weight: var(--weight-extrabold); }
+.u-text-title   { font-family: var(--font-title); font-size: var(--font-2xl); font-weight: var(--weight-bold); }
+.u-text-body    { font-family: var(--font-body); font-size: var(--font-md); line-height: 1.6; color: var(--text-body); }
+.u-text-small   { font-family: var(--font-body); font-size: var(--font-sm); color: var(--text-muted); }
