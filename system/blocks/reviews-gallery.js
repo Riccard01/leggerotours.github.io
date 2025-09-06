@@ -24,7 +24,6 @@
             -webkit-overflow-scrolling:touch;
             scroll-snap-type:x mandatory;
             padding-block:24px;
-            touch-action: pan-x;
           }
           :host([data-ready="true"]){ opacity:1; }
           :host::-webkit-scrollbar{ display:none; }
@@ -45,8 +44,8 @@
             scroll-snap-stop: always; 
             position:relative;
             transition:
-              transform .35s cubic-bezier(.2,.8,.2,1),
-              opacity .35s;
+              transform .15s cubic-bezier(.2,.8,.2,1),
+              opacity .15s;
             transform: translateY(36px) scale(.9);
             opacity:.8;
             z-index:1;

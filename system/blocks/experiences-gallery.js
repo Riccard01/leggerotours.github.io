@@ -18,7 +18,6 @@
             gap: var(--gap, 32px);
             padding: var(--pad, 16px);
             width: 100%;
-            touch-action: pan-x;
     }
 
 

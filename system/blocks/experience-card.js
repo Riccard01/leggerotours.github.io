@@ -37,7 +37,6 @@
       this.shadowRoot.innerHTML = `
         <style>
           :host{
-            --glow-delay:.30s; --glow-dur:.62s; --glow-rgb:0,160,255;
             inline-size: var(--card-w, 220px);
             display:flex; aspect-ratio:9/16; border-radius:16px;
             position:relative; overflow:visible;
