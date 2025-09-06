@@ -90,26 +90,6 @@
         </style>
 
       <experience-card
-        id="exp-1"
-        price="€570 per group"
-        image="./assets/images/boccadasse.jpg"
-        title="The Rainbow Tour"
-        description="Esplora luoghi selvaggi e baie segrete, da Punta Chiappa a Portofino."
-        tag="Tutto il giorno"
-        cta="Configura"
-        badge-image="/assets/thumbs/portofino.jpg">
-        <ds-button slot="cta" value="rainbow" variant="with-icon-light" size="md" full>
-          <span slot="text">Configura</span>
-        </ds-button>
-        <story-badge src="/assets/icons/map.svg" label="Scopri programma" size="56" duration="1600">
-          <img slot="1" src="/assets/images/faro.jpg" data-ms="3200">
-          <video slot="2" src="/assets/videos/amerigo.mp4"></video>
-          <video slot="2" src="/assets/videos/gourmet.mp4"></video>
-          <img slot="3" src="/assets/images/me.jpg">
-        </story-badge>
-      </experience-card>
-
-      <experience-card
         id="exp-2"
         price="€570 per group"
         image="./assets/images/portofino.jpg"
