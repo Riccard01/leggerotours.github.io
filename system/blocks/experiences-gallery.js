@@ -18,145 +18,102 @@
             gap: var(--gap, 32px);
             padding: var(--pad, 16px);
             width: 100%;
-    }
-
-
-
-
-@media (max-width: 500px) {
-          :host {
-            display: flex;
-            flex-direction: row;
-            align-items: stretch;
-            gap: var(--gap, 32px);
-            padding: var(--pad, 16px);
-            box-sizing: border-box;
-            width: 100%;
-            padding: 7rem 0;
-            /* scroller */
-            overflow-x: auto;
-            overflow-y: hidden;
-            -webkit-overflow-scrolling: touch;
-
-            /* snap */
-            scroll-snap-type: x mandatory;
           }
-          :host::-webkit-scrollbar { display: none; }
 
-          :host > * {
-            flex: 0 0 auto;
-            scroll-snap-align: center;
-            scroll-snap-stop: always;  
+          /* fuori mobile gli spacer non servono */
+          .spacer{ display:none; }
+
+          @media (max-width: 500px) {
+            :host {
+              display: flex;
+              flex-direction: row;
+              align-items: stretch;
+              gap: var(--gap, 32px);
+              padding: 7rem 0;
+              box-sizing: border-box;
+              width: 100%;
+              /* scroller */
+              overflow-x: auto;
+              overflow-y: hidden;
+              -webkit-overflow-scrolling: touch;
+              /* snap */
+              scroll-snap-type: x mandatory;
+            }
+            :host::-webkit-scrollbar { display: none; }
+
+            :host > * {
+              flex: 0 0 auto;
+              scroll-snap-align: center;
+              scroll-snap-stop: always;
+            }
+
+            /* padding interno ai lati + centratura prima/ultima */
+            .spacer{
+              display:block;
+              flex: 0 0 max(12px, calc(50% - var(--peek, 110px)));
+            }
           }
-            .spacer{ 
-  flex: 0 0 max(8px, calc(50% - var(--peek, 110px)));
-}
-
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
         </style>
 
-      <experience-card
-        id="exp-2"
-        price="€570 per group"
-        image="./assets/images/portofino.jpg"
-        title="The Rainbow Tour"
-        description="Esplora luoghi selvaggi e baie segrete, da Punta Chiappa a Portofino."
-        tag="Tutto il giorno"
-        cta="Configura"
-        badge-image="/assets/thumbs/portofino.jpg"
-        badge-label="Programma e rotte"
-        badge-desc="Baia segreta + aperitivo">
-        <ds-button slot="cta" value="rainbow-2" variant="with-icon-light" size="md" full>
-          <span slot="text">Configura</span>
-        </ds-button>
-      </experience-card>
+        <div class="spacer" aria-hidden="true"></div>
 
-      <experience-card
-        id="exp-3"
-        price="€390 per group"
-        image="./assets/images/genovese.jpg"
-        title="Gourmet Sunset Cruise"
-        description="Un'esperienza al tramonto con degustazione di piatti tipici."
-        tag="Al tramonto"
-        cta="Configura">
-        <ds-button slot="cta" value="gourmet" variant="with-icon-light" size="md" full>
-          <span slot="text">Configura</span>
-        </ds-button>
-      </experience-card>
+        <experience-card
+          id="exp-2"
+          price="€570 per group"
+          image="./assets/images/portofino.jpg"
+          title="The Rainbow Tour"
+          description="Esplora luoghi selvaggi e baie segrete, da Punta Chiappa a Portofino.">
+          <ds-button slot="cta" value="rainbow-2" variant="with-icon-light" size="md" full>
+            <span slot="text">Configura</span>
+          </ds-button>
+        </experience-card>
 
-      <experience-card
-        id="exp-5"
-        price="€1200 per group"
-        image="./assets/images/special.jpg"
-        title="Stella Maris"
-        description="Camogli e San Fruttuoso con aperitivo a bordo."
-        tag="Al tramonto"
-        cta="Configura">
-        <ds-button slot="cta" value="stella-maris" variant="with-icon-light" size="md" full>
-          <span slot="text">Configura</span>
-        </ds-button>
-      </experience-card>
+        <experience-card
+          id="exp-3"
+          price="€390 per group"
+          image="./assets/images/genovese.jpg"
+          title="Gourmet Sunset Cruise"
+          description="Un'esperienza al tramonto con degustazione di piatti tipici.">
+          <ds-button slot="cta" value="gourmet" variant="with-icon-light" size="md" full>
+            <span slot="text">Configura</span>
+          </ds-button>
+        </experience-card>
 
-      <experience-card
-        id="exp-6"
-        price="€1200 per group"
-        image="./assets/images/fireworks.jpg"
-        title="Recco Fireworks"
-        description="Sentieri panoramici con viste mozzafiato."
-        tag="Mezza giornata"
-        cta="Scopri">
-        <ds-button slot="cta" value="fireworks" variant="with-icon-light" size="md" full>
-          <span slot="text">Configura</span>
-        </ds-button>
-      </experience-card>
+        <experience-card
+          id="exp-5"
+          price="€1200 per group"
+          image="./assets/images/special.jpg"
+          title="Stella Maris"
+          description="Camogli e San Fruttuoso con aperitivo a bordo.">
+          <ds-button slot="cta" value="stella-maris" variant="with-icon-light" size="md" full>
+            <span slot="text">Configura</span>
+          </ds-button>
+        </experience-card>
 
-      <experience-card
-        id="exp-6"
-        price="€1200 per group"
-        image="./assets/images/amerigo.jpg"
-        title="Amerigo Vespucci"
-        description="Sentieri panoramici con viste mozzafiato."
-        tag="Mezza giornata"
-        cta="Scopri">
-        <ds-button slot="cta" value="fireworks" variant="with-icon-light" size="md" full>
-          <span slot="text">Configura</span>
-        </ds-button>
-        <story-badge src="/assets/images/camogli.jpg" label="Tappe" size="56" duration="2600"></story-badge>
-      </experience-card>
+        <experience-card
+          id="exp-6"
+          price="€1200 per group"
+          image="./assets/images/fireworks.jpg"
+          title="Recco Fireworks"
+          description="Sentieri panoramici con viste mozzafiato.">
+          <ds-button slot="cta" value="fireworks" variant="with-icon-light" size="md" full>
+            <span slot="text">Configura</span>
+          </ds-button>
+        </experience-card>
+
+        <experience-card
+          id="exp-6b"
+          price="€1200 per group"
+          image="./assets/images/amerigo.jpg"
+          title="Amerigo Vespucci"
+          description="Sentieri panoramici con viste mozzafiato.">
+          <ds-button slot="cta" value="fireworks" variant="with-icon-light" size="md" full>
+            <span slot="text">Configura</span>
+          </ds-button>
+          <story-badge src="/assets/images/camogli.jpg" label="Tappe" size="56" duration="2600"></story-badge>
+        </experience-card>
+
+        <div class="spacer" aria-hidden="true"></div>
       `;
     }
 

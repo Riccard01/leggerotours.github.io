@@ -3,7 +3,9 @@
   if (customElements.get('experience-card')) return;
 
   class ExperienceCard extends HTMLElement {
-    static get observedAttributes() { return ['image','title','description','tag','price']; }
+    static get observedAttributes() {
+      return ['image','title','description','price','time','filters','tag'];
+    }
 
     constructor() {
       super();
@@ -29,15 +31,24 @@
       this._image = this.getAttribute('image') || '';
       this._title = this.getAttribute('title') || 'Titolo esperienza';
       this._desc  = this.getAttribute('description') || 'Descrizione breve...';
-      this._tag   = this.getAttribute('tag') || '';
-      this._price = this.getAttribute('price') || '';
+
+      // meta pills (2): prezzo + orario
+      this._price = this.getAttribute('price') || 'Prezzo su richiesta';
+      this._time  = this.getAttribute('time')  || 'Orario variabile';
+
+      // filtri/chips sopra al titolo: "filters" comma-separated o fallback "tag"
+      const raw = this.getAttribute('filters') || this.getAttribute('tag') || '';
+      this._filters = raw
+        .split(',')
+        .map(s => s.trim())
+        .filter(Boolean)
+        .slice(0, 3); // max 3 chip
     }
 
     _render() {
       this.shadowRoot.innerHTML = `
         <style>
           :host{
-            /* controlli glow */
             --glow-dur:.30s;
             --glow-rgb:0,160,255;
 
@@ -54,34 +65,24 @@
             width: 240px;
           }
 
-          /* Hover zoom SOLO su device con hover reale (desktop) */
           @media (hover: hover) and (pointer: fine){
             :host(:hover){ transform: scale(1.07); }
           }
-
-          /* Su mobile: la card attiva (centrata) si ingrandisce */
           @media (hover: none) and (pointer: coarse){
             :host([data-active]){ transform: scale(1.08); }
           }
 
-          /* === Glow stile review-card: visibile soprattutto in basso, niente mask, z-index sopra agli sfondi === */
+          /* Glow */
           :host::before{
             content:""; position:absolute; inset:0; border-radius:inherit; pointer-events:none;
-            /* sopra .bg/overlay/feather (z=0/2), sotto contenuti (z=5) e outline (z=6) */
-            z-index:3;
-            opacity:0; transform:scale(1);
-            /* gradient interno + glow esterno verso il basso + un filo dentro */
+            z-index:3; opacity:0; transform:scale(1);
             background:
               radial-gradient(82% 72% at 50% 106%, rgba(var(--glow-rgb),.34) 0%, rgba(var(--glow-rgb),.16) 40%, rgba(0,0,0,0) 70%);
             box-shadow:
               0 28px 56px -16px rgba(var(--glow-rgb), .55),
               0 0 0 1.5px       rgba(var(--glow-rgb), .40),
               inset 0 -14px 28px     rgba(var(--glow-rgb), .28);
-            transition:
-              opacity var(--glow-dur),
-              transform var(--glow-dur),
-              box-shadow var(--glow-dur),
-              background var(--glow-dur);
+            transition: opacity var(--glow-dur), transform var(--glow-dur), box-shadow var(--glow-dur), background var(--glow-dur);
           }
           :host([data-active])::before{
             opacity:1; transform:scale(1);
@@ -107,12 +108,6 @@
           :host([data-active]) .shine::before{ animation:shine-slide 1.6s ease-in-out .28s forwards; }
           @keyframes shine-slide{ 0%{top:-150%;opacity:0} 25%{opacity:.85} 55%{top:0%;opacity:.95} 100%{top:150%;opacity:0} }
 
-          .price-badge{ position:absolute; top:-2rem; left:0; right:0; display:flex; justify-content:center; pointer-events:none; z-index:7;
-            font:400 .9rem/1 system-ui; letter-spacing:.0375rem; text-transform:uppercase; text-shadow:0 0 4px rgba(255,255,255,.2);
-            background:linear-gradient(180deg,#FFF 0%,#999 100%); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent;
-            opacity:0; transition:opacity .18s ease; }
-          :host([data-active]) .price-badge{ opacity:1; }
-
           .bg{ position:absolute; inset:0; background-size:cover; background-position:center; z-index:0; }
           .overlay{ position:absolute; inset:0; pointer-events:none; z-index:2;
             background:linear-gradient(to top,rgba(0,0,0,.65) 0%,rgba(0,0,0,.35) 35%,rgba(0,0,0,.10) 60%,rgba(0,0,0,0) 85%); }
@@ -121,51 +116,107 @@
             background:rgba(6,10,22,.12); mask-image:linear-gradient(to top,black 60%,transparent 100%);
             -webkit-mask-image:linear-gradient(to top,black 60%,transparent 100%); z-index:2; pointer-events:none; }
 
-          .content{ position:absolute; left:0; right:0; bottom:0; display:flex; flex-direction:column; gap:8px; padding:12px; z-index:5; }
-          .tag{ font-size:12px; font-weight:600; color:#e2e8f0; background:rgba(37,99,235,.18); border:1px solid rgba(255,255,255,.45);
-            padding:2px 8px; border-radius:999px; width:fit-content; display:none; }
-          h3{ font-size:18px; margin:0; font-weight:700; line-height:1.2; }
+          .content{
+            position:absolute; left:0; right:0; bottom:0;
+            display:flex; flex-direction:column; gap:6px; /* gap ridotto */
+            padding:12px; z-index:5;
+          }
+
+          /* FILTRI (sopra al titolo) */
+          .filters{
+            display:flex; gap:6px; flex-wrap:wrap;
+            margin-bottom:2px; /* molto vicino al titolo */
+          }
+          .chip{
+            font-size:11px; font-weight:700; line-height:1;
+            color:#bfe6ff;
+            background:rgba(0,160,255,.10);
+            border:1px solid rgba(255,255,255,.28);
+            padding:6px 8px; border-radius:999px; width:fit-content;
+            letter-spacing:.02em;
+          }
+
+          h3{ font-size:18px; margin:0; font-weight:700; line-height:1.18; }
           p{ font-size:14px; margin:0; color:#d1d5db; }
+
+          /* TAG sotto la descrizione: prezzo + orario (2 pill) */
+          .meta{ display:flex; gap:8px; flex-wrap:wrap; margin-top:4px; }
+          .pill{
+            font-size:12px; font-weight:600; line-height:1;
+            color:#e2f2ff;
+            background:rgba(37,99,235,.18);
+            border:1px solid rgba(255,255,255,.35);
+            padding:6px 10px; border-radius:999px; width:fit-content;
+          }
+
           .cta{ margin-top:8px; }
           .cta ::slotted(ds-button){ display:inline-block; width:auto; }
           .cta ::slotted(ds-button[full]){ display:block; width:100%; }
         </style>
 
-        <div class="price-badge" hidden></div>
         <div class="clip">
           <div class="bg" part="bg"></div>
           <div class="overlay"></div>
           <div class="feather"></div>
+
           <div class="content">
-            <span class="tag" part="tag"></span>
+            <div class="filters" part="filters" hidden></div>
+
             <h3 part="title"></h3>
             <p part="description"></p>
+
+            <div class="meta">
+              <span class="pill pill-price" part="price"></span>
+              <span class="pill pill-time"  part="time"></span>
+            </div>
+
             <div class="cta" part="cta">
-              <slot name="cta"><ds-button variant="with-icon-light" size="md"><img class="icon" src="/assets/icons/brands/whatsapp.svg" alt=""></ds-button></slot>
+              <slot name="cta">
+                <ds-button variant="with-icon-light" size="md">
+                  <img class="icon" src="/assets/icons/brands/whatsapp.svg" alt="">
+                </ds-button>
+              </slot>
             </div>
           </div>
+
           <div class="shine"></div>
         </div>
       `;
     }
 
     _mount() {
-      this.$price = this.shadowRoot.querySelector('.price-badge');
       this.$bg    = this.shadowRoot.querySelector('.bg');
-      this.$tag   = this.shadowRoot.querySelector('.tag');
       this.$title = this.shadowRoot.querySelector('h3');
       this.$desc  = this.shadowRoot.querySelector('p');
+      this.$filters = this.shadowRoot.querySelector('.filters');
+      this.$pillPrice = this.shadowRoot.querySelector('.pill-price');
+      this.$pillTime  = this.shadowRoot.querySelector('.pill-time');
     }
 
     _updateUI() {
-      if (!this.$bg || !this.$title || !this.$desc || !this.$price || !this.$tag) return;
+      if (!this.$bg || !this.$title || !this.$desc) return;
+
       this.$bg.style.backgroundImage = this._image ? `url("${this._image}")` : 'none';
       this.$title.textContent = this._title;
       this.$desc.textContent  = this._desc;
-      if (this._tag && this._tag.trim()) { this.$tag.textContent = this._tag; this.$tag.style.display = 'inline-block'; }
-      else this.$tag.style.display = 'none';
-      const v = (this._price || '').trim();
-      this.$price.textContent = v; this.$price.hidden = !v;
+
+      // FILTRI
+      if (this._filters && this._filters.length){
+        this.$filters.hidden = false;
+        this.$filters.innerHTML = '';
+        this._filters.forEach(f => {
+          const s = document.createElement('span');
+          s.className = 'chip';
+          s.textContent = f;
+          this.$filters.appendChild(s);
+        });
+      } else {
+        this.$filters.hidden = true;
+      }
+
+      // META (2 tag): sempre presenti con fallback elegante
+      this.$pillPrice.textContent = this._price || 'Prezzo su richiesta';
+      this.$pillTime.textContent  = this._time  || 'Orario variabile';
     }
   }
 
