@@ -19,6 +19,11 @@
       this._mount();
       this._mounted = true;
       this._updateUI();
+      this._observeResize();
+    }
+
+    disconnectedCallback() {
+      if (this._ro) this._ro.disconnect();
     }
 
     attributeChangedCallback() {
@@ -36,13 +41,13 @@
       this._price = this.getAttribute('price') || 'Prezzo su richiesta';
       this._time  = this.getAttribute('time')  || 'Orario variabile';
 
-      // filtri/chips sopra al titolo: "filters" comma-separated o fallback "tag"
+      // filtri/chips (sopra al titolo): "filters" comma-separated o fallback "tag"
       const raw = this.getAttribute('filters') || this.getAttribute('tag') || '';
       this._filters = raw
         .split(',')
         .map(s => s.trim())
         .filter(Boolean)
-        .slice(0, 3); // max 3 chip
+        .slice(0, 4); // max 4 chip
     }
 
     _render() {
@@ -122,32 +127,44 @@
             padding:12px; z-index:5;
           }
 
-          /* FILTRI (sopra al titolo) */
-          .filters{
-            display:flex; gap:6px; flex-wrap:wrap;
-            margin-bottom:2px; /* molto vicino al titolo */
+          /* RIGHE TAG: no wrap + shrink */
+          .filters, .meta{
+            display:flex; align-items:center; gap:6px;
+            flex-wrap:nowrap; overflow:hidden;
+            margin:0; padding:0;
+            /* la dimensione testo dei tag viene controllata via --tag-fs */
+            --tag-fs: 11px;
+          }
+
+          /* ordine: prima filtri, poi meta, poi titolo, poi descrizione */
+          .filters{ margin-bottom:2px; }
+          .meta{ margin-bottom:4px; }
+
+          .chip, .pill{
+            font-size: var(--tag-fs);
+            font-weight:700;
+            line-height:1;
+            white-space:nowrap;
+            flex: 0 1 auto;  /* permetti shrink */
+            min-width:0;
+            padding:6px 8px;
+            border-radius:999px;
+            border:1px solid rgba(255,255,255,.28);
+            letter-spacing:.02em;
+            width: fit-content;
           }
           .chip{
-            font-size:11px; font-weight:700; line-height:1;
             color:#bfe6ff;
             background:rgba(0,160,255,.10);
-            border:1px solid rgba(255,255,255,.28);
-            padding:6px 8px; border-radius:999px; width:fit-content;
-            letter-spacing:.02em;
+          }
+          .pill{
+            color:#e2f2ff;
+            background:rgba(37,99,235,.18);
+            border-color:rgba(255,255,255,.35);
           }
 
           h3{ font-size:18px; margin:0; font-weight:700; line-height:1.18; }
           p{ font-size:14px; margin:0; color:#d1d5db; }
-
-          /* TAG sotto la descrizione: prezzo + orario (2 pill) */
-          .meta{ display:flex; gap:8px; flex-wrap:wrap; margin-top:4px; }
-          .pill{
-            font-size:12px; font-weight:600; line-height:1;
-            color:#e2f2ff;
-            background:rgba(37,99,235,.18);
-            border:1px solid rgba(255,255,255,.35);
-            padding:6px 10px; border-radius:999px; width:fit-content;
-          }
 
           .cta{ margin-top:8px; }
           .cta ::slotted(ds-button){ display:inline-block; width:auto; }
@@ -160,15 +177,15 @@
           <div class="feather"></div>
 
           <div class="content">
+            <!-- TAG sopra al titolo -->
             <div class="filters" part="filters" hidden></div>
-
-            <h3 part="title"></h3>
-            <p part="description"></p>
-
             <div class="meta">
               <span class="pill pill-price" part="price"></span>
               <span class="pill pill-time"  part="time"></span>
             </div>
+
+            <h3 part="title"></h3>
+            <p part="description"></p>
 
             <div class="cta" part="cta">
               <slot name="cta">
@@ -189,6 +206,7 @@
       this.$title = this.shadowRoot.querySelector('h3');
       this.$desc  = this.shadowRoot.querySelector('p');
       this.$filters = this.shadowRoot.querySelector('.filters');
+      this.$meta = this.shadowRoot.querySelector('.meta');
       this.$pillPrice = this.shadowRoot.querySelector('.pill-price');
       this.$pillTime  = this.shadowRoot.querySelector('.pill-time');
     }
@@ -212,11 +230,41 @@
         });
       } else {
         this.$filters.hidden = true;
+        this.$filters.innerHTML = '';
       }
 
-      // META (2 tag): sempre presenti con fallback elegante
+      // META (2 tag): prezzo + orario
       this.$pillPrice.textContent = this._price || 'Prezzo su richiesta';
       this.$pillTime.textContent  = this._time  || 'Orario variabile';
+
+      // Fit su una sola riga per i contenitori tag
+      this._fitRow(this.$filters);
+      this._fitRow(this.$meta);
+    }
+
+    _fitRow(row){
+      if (!row || row.hidden) return;
+      // reset a dimensione base
+      row.style.setProperty('--tag-fs', '11px');
+      const max = 11, min = 9;
+      // se non sta su una riga, riduci font-size gradualmente
+      let fs = max, guard = 0;
+      while (row.scrollWidth > row.clientWidth && fs > min && guard < 8) {
+        fs -= 0.5;
+        row.style.setProperty('--tag-fs', fs + 'px');
+        guard++;
+      }
+      // come ulteriore protezione, nascondi l’eventuale overflow visuale
+      row.style.overflow = 'hidden';
+    }
+
+    _observeResize(){
+      if (this._ro) this._ro.disconnect();
+      this._ro = new ResizeObserver(() => {
+        this._fitRow(this.$filters);
+        this._fitRow(this.$meta);
+      });
+      this._ro.observe(this);
     }
   }
 
