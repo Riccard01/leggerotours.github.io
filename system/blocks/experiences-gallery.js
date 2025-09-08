@@ -38,19 +38,19 @@
           { id:'firew',   title:'Recco Fireworks',  price:'€1200 per group',img:'./assets/images/fireworks.jpg',   desc:'Notte di fuochi dal mare.' },
         ],
         barca: [
-          { id:'gozzo',  title:'Gozzo Ligure',    price:'Incluso', img:'https://picsum.photos/seed/gozzo/800/600',  desc:'Classico e confortevole.' },
-          { id:'rib',    title:'Gommone RIB',     price:'+ €90',   img:'https://picsum.photos/seed/rib/800/600',    desc:'Agile e veloce.' },
-          { id:'yacht',  title:'Piccolo Yacht',   price:'+ €350',  img:'https://picsum.photos/seed/yacht/800/600',  desc:'Eleganza e spazio.' },
+          { id:'gozzo',  title:'Leggera',    price:'Incluso', img:'./assets/images/leggera.jpg',  desc:'Classico e confortevole.' },
+          { id:'rib',    title:'Gozzo Ligure',     price:'+ €90',   img:'./assets/images/barca2.jpg',    desc:'Agile e veloce.' },
+          { id:'yacht',  title:'Piccolo Yacht',   price:'+ €350',  img:'./assets/images/barca3.jpg',  desc:'Eleganza e spazio.' },
         ],
         cibo: [
-          { id:'focaccia', title:'Focaccia & Pesto', price:'+ €30', img:'https://picsum.photos/seed/focaccia/800/600', desc:'Tipico ligure.' },
-          { id:'crudo',    title:'Crudi di Mare',    price:'+ €80', img:'https://picsum.photos/seed/crudi/800/600',    desc:'Selezione del giorno.' },
-          { id:'veget',    title:'Vegetariano',      price:'+ €25', img:'https://picsum.photos/seed/veg/800/600',      desc:'Fresco e leggero.' },
+          { id:'focaccia', title:'Prosciutto e melone', price:'+ €30', img:'./assets/images/melone.jpg', desc:'Tipico ligure.' },
+          { id:'crudo',    title:'Instalata di anguria e cipolle',    price:'+ €80', img:'./assets/images/anguria.jpg',    desc:'Selezione del giorno.' },
+          { id:'veget',    title:'Vegetariano',      price:'+ €25', img:'./assets/images/couscous.jpg',      desc:'Fresco e leggero.' },
         ],
         porto: [
-          { id:'camogli',  title:'Camogli',     price:'—', img:'https://picsum.photos/seed/camogli/800/600',  desc:'Partenza dal molo principale.' },
-          { id:'recco',    title:'Recco',       price:'—', img:'https://picsum.photos/seed/recco/800/600',    desc:'Comodo parcheggio.' },
-          { id:'portofino',title:'Portofino',   price:'—', img:'https://picsum.photos/seed/portofino/800/600',desc:'Iconico borgo.' },
+          { id:'camogli',  title:'Porto Antico',     price:'—', img:'./assets/images/portoantico.jpg',  desc:'Partenza dal molo principale.' },
+          { id:'recco',    title:'Portofino',       price:'—', img:'./assets/images/porto1.jpg',    desc:'Comodo parcheggio.' },
+          { id:'portofino',title:'Recco',   price:'—', img:'./assets/images/portofino.jpg',desc:'Iconico borgo.' },
         ]
       };
 
@@ -67,8 +67,8 @@
 
             /* padding separati (puoi override da fuori) */
             --pad-inline: 16px;
-            --pad-top: 7rem;
-            --pad-bottom: 16px;
+            --pad-top: 3rem;
+            --pad-bottom: 8rem;
             --pad-top-desktop: 4rem;
 
             /* animazioni */
