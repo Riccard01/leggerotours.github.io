@@ -1,9 +1,8 @@
 // /system/blocks/experiences-gallery.js
 // Form a step: Esperienza -> Barca -> Cibo (1 sola) -> Porto
-// - Scroll orizzontale con snap center
-// - Scaling graduale in base alla distanza dal centro
-// - Tab di progresso in alto
-// - Emissione evento finale: "form-complete" con { esperienza, barca, cibo, porto }
+// - Tabs "classy" sotto al sottotitolo, non sticky/fixed
+// - Scroll orizzontale con snap + scaling graduale
+// - Emissione finale "form-complete"
 (() => {
   if (customElements.get('experiences-gallery')) return;
 
@@ -24,12 +23,12 @@
       this._currentStep = 0;
       this._selections = { esperienza: null, barca: null, cibo: null, porto: null };
 
-      // Dati demo (immagini random)
+      // Dati demo
       this._data = {
         esperienza: [
-          { id:'rainbow', title:'The Rainbow Tour', price:'€570 per group', img:'./assets/images/portofino.jpg', desc:'Esplora baie segrete da Punta Chiappa a Portofino.' },
-          { id:'gourmet', title:'Gourmet Sunset',   price:'€390 per group', img:'./assets/images/genovese.jpg', desc:'Tramonto con degustazione a bordo.' },
-          { id:'stella',  title:'Stella Maris',     price:'€1200 per group',img:'./assets/images/special.jpg',  desc:'Camogli e San Fruttuoso con aperitivo.' },
+          { id:'rainbow', title:'The Rainbow Tour', price:'€570 per group', img:'./assets/images/portofino.jpg',   desc:'Esplora baie segrete da Punta Chiappa a Portofino.' },
+          { id:'gourmet', title:'Gourmet Sunset',   price:'€390 per group', img:'./assets/images/genovese.jpg',    desc:'Tramonto con degustazione a bordo.' },
+          { id:'stella',  title:'Stella Maris',     price:'€1200 per group',img:'./assets/images/special.jpg',     desc:'Camogli e San Fruttuoso con aperitivo.' },
           { id:'firew',   title:'Recco Fireworks',  price:'€1200 per group',img:'./assets/images/fireworks.jpg',   desc:'Notte di fuochi dal mare.' },
         ],
         barca: [
@@ -43,99 +42,106 @@
           { id:'veget',    title:'Vegetariano',      price:'+ €25', img:'https://picsum.photos/seed/veg/800/600',      desc:'Fresco e leggero.' },
         ],
         porto: [
-          { id:'camogli',  title:'Camogli',    price:'—', img:'https://picsum.photos/seed/camogli/800/600',  desc:'Partenza dal molo principale.' },
-          { id:'recco',    title:'Recco',      price:'—', img:'https://picsum.photos/seed/recco/800/600',    desc:'Comodo parcheggio.' },
-          { id:'portofino',title:'Portofino',  price:'—', img:'https://picsum.photos/seed/portofino/800/600',desc:'Iconico borgo.' },
+          { id:'camogli',  title:'Camogli',     price:'—', img:'https://picsum.photos/seed/camogli/800/600',  desc:'Partenza dal molo principale.' },
+          { id:'recco',    title:'Recco',       price:'—', img:'https://picsum.photos/seed/recco/800/600',    desc:'Comodo parcheggio.' },
+          { id:'portofino',title:'Portofino',   price:'—', img:'https://picsum.photos/seed/portofino/800/600',desc:'Iconico borgo.' },
         ]
       };
 
       this.shadowRoot.innerHTML = `
         <style>
-          :host {
-            /* tuning effetti */
-            --falloff: 260px;
-            --scale-min: 0.92;
-            --scale-max: 1.06;
-            --opacity-min: 0.9;
+:host {
+  /* tuning effetti */
+  --falloff: 260px;
+  --scale-min: 0.92;
+  --scale-max: 1.06;
+  --opacity-min: 0.9;
 
-            --gap: 32px;
-            --pad: 16px;
-            --peek: 110px;
+  --gap: 32px;
 
-            display: block;
-            width: 100%;
-            box-sizing: border-box;
+  /* ✅ padding separati */
+  --pad-inline: 16px;     /* left & right */
+  --pad-top: 1rem;        /* top mobile di default */
+  --pad-bottom: 7rem;     /* bottom */
+
+  /* (opzionale) override desktop */
+  --pad-top-desktop: 4rem;
+
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+
+          /* Headline step */
+          .headline {
+            margin: 16px 16px 6px;
+            font: 700 18px/1.3 system-ui, sans-serif;
+            color: var(--tabs-fg-active);
           }
 
-          /* Tabs di progresso */
+          /* Breadcrumbs (non sticky, senza sfondo contenitore) */
           .tabs {
-            position: sticky;
-            top: 0;
-            z-index: 10;
-            background: linear-gradient(to bottom, rgba(255,255,255,.95), rgba(255,255,255,.85));
-            backdrop-filter: blur(6px);
-            padding: 8px 12px;
-            border-bottom: 1px solid #e5e7eb;
+            position: static;      /* NON sticky/fixed */
+            background: transparent;
+            backdrop-filter: none;
+            padding: 6px 12px 10px;
+            border-bottom: 1px solid var(--tabs-divider);
           }
           .tabs .row {
             display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 8px;
+            grid-template-columns: repeat(4, auto);
+            gap: 18px;
             align-items: center;
+            justify-content: flex-start;
           }
           .tab {
-            display: flex;
+            display: inline-flex;
             align-items: center;
-            justify-content: center;
-            gap: 8px;
-            padding: 10px 12px;
-            font: 600 14px/1 system-ui, sans-serif;
-            border-radius: 999px;
-            border: 1px solid #e5e7eb;
-            background: #fff;
-            color: #0b1220;
+            gap: 6px;
+            padding: 4px 0;
+            font: 600 14px/1.4 "Plus Jakarta Sans", system-ui, sans-serif;
+            color: var(--tabs-fg-dim);
+            background: transparent;
+            border: none;
+            border-radius: 0;
             cursor: pointer;
             user-select: none;
-            transition: background .15s ease, border-color .15s ease, color .15s ease;
-            white-space: nowrap;
+            transition: color .15s ease;
           }
-          .tab[data-active="true"] {
-            border-color: #c7d2fe;
-            background: #eef2ff;
-            color: #3730a3;
-          }
+          .tab:hover:not([aria-disabled="true"]) { color: var(--tabs-fg-active); text-decoration: underline; }
+          .tab[data-active="true"] { color: var(--tabs-fg-active); }
+          .tab[aria-disabled="true"] { opacity: .45; cursor: default; }
+
           .tab[data-done="true"]::after {
             content: "✓";
-            font-weight: 900;
+            font-weight: 700;
             margin-left: 6px;
-          }
-          .tab[aria-disabled="true"] {
-            opacity: .5;
-            pointer-events: none;
+            font-size: 13px;
+            color: currentColor;
           }
 
           /* Wrapper scroller */
-          .wrap {
-            position: relative;
-          }
+          .wrap { position: relative; }
 
           /* Scroller orizzontale con snap */
-          .scroller {
-            display: flex;
-            flex-direction: row;
-            gap: var(--gap);
-            padding: var(--pad);
-            padding-top: 7rem; /* richiesto */
-            width: 100%;
-            box-sizing: border-box;
+.scroller {
+  display: flex;
+  flex-direction: row;
+  gap: var(--gap);
 
-            overflow-x: auto;
-            overflow-y: hidden;
-            -webkit-overflow-scrolling: touch;
-            scroll-snap-type: x mandatory;
-          }
+  /* ✅ padding separati */
+  padding: var(--pad-top) var(--pad-inline) var(--pad-bottom) var(--pad-inline);
+
+  width: 100%;
+  box-sizing: border-box;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  scroll-snap-type: x mandatory;
+}
+
           .scroller::-webkit-scrollbar { display: none; }
-
           .scroller > * {
             flex: 0 0 auto;
             scroll-snap-align: center;
@@ -172,31 +178,26 @@
             pointer-events: none;
           }
 
-          /* Headline step */
-          .headline {
-            margin: 16px 16px 8px;
-            font: 700 18px/1.2 system-ui, sans-serif;
-            color: #0b1220;
-          }
+@media (min-width: 501px) {
+  .scroller {
+    /* ✅ top desktop separato */
+    padding-top: var(--pad-top-desktop);
+  }
+}
 
-          @media (min-width: 501px) {
-            .scroller {
-              /* su desktop mostriamo comunque scroller + snap */
-              padding-top: 4rem;
-            }
-          }
         </style>
 
+        <div class="headline" id="headline"></div>
+
+        <!-- BREADCRUMBS: ora sotto il sottotitolo, non sticky -->
         <div class="tabs" role="tablist" aria-label="Percorso prenotazione">
           <div class="row" id="tabsRow"></div>
         </div>
 
-        <div class="headline" id="headline"></div>
-
         <div class="wrap">
           <div class="scroller" id="scroller">
             <div class="spacer" aria-hidden="true"></div>
-            <!-- cards verranno generate qui -->
+            <!-- cards create dinamicamente -->
             <div class="spacer" aria-hidden="true"></div>
           </div>
         </div>
@@ -208,22 +209,19 @@
       this._renderTabs();
       this._renderStep();
 
-      // Scroll listener per scaling
       const scroller = this.shadowRoot.getElementById('scroller');
       scroller.addEventListener('scroll', this._onScroll, { passive: true });
 
-      // Resize observer per ricalcolare scaling/spacers
       this._ro = new ResizeObserver(() => this._queueUpdate());
       this._ro.observe(scroller);
 
-      // Primo update
       requestAnimationFrame(() => this._queueUpdate());
     }
 
     disconnectedCallback() {
       const scroller = this.shadowRoot.getElementById('scroller');
       scroller?.removeEventListener('scroll', this._onScroll);
-      if (this._ro) this._ro.disconnect();
+      this._ro?.disconnect();
       if (this._raf) cancelAnimationFrame(this._raf);
     }
 
@@ -244,10 +242,7 @@
         b.dataset.active = (i === this._currentStep) ? 'true' : 'false';
         b.setAttribute('aria-selected', i === this._currentStep ? 'true' : 'false');
 
-        // Permetti di tornare agli step già completati
-        if (i > this._currentStep && !done) {
-          b.setAttribute('aria-disabled', 'true');
-        }
+        if (i > this._currentStep && !done) b.setAttribute('aria-disabled', 'true');
 
         b.addEventListener('click', () => {
           if (i <= this._currentStep) {
@@ -268,34 +263,29 @@
 
       head.textContent = this._headlineFor(step.key);
 
-      // Rendi le card per lo step
+      // Pulisci le card, lascia gli spacer
+      const nodes = Array.from(scroller.children).filter(n => !n.classList.contains('spacer'));
+      nodes.forEach(n => n.remove());
+
+      // Inserisci card nell'ordine corretto (sempre prima dello spacer finale)
       const items = this._data[step.key] || [];
-      // Manteniamo i due spacer già presenti come primo e ultimo child
-      const children = Array.from(scroller.children).filter(n => !n.classList.contains('spacer'));
-      for (const n of children) n.remove();
+      const anchor = scroller.lastElementChild; // spacer finale
+      const frag = document.createDocumentFragment();
+      items.forEach(item => frag.appendChild(this._createCard(step.key, item)));
+      scroller.insertBefore(frag, anchor);
 
-      // ✅ mantiene l'ordine
-      const anchor = scroller.lastElementChild; // lo spacer in coda
-      items.forEach(item => {
-        const card = this._createCard(step.key, item);
-        scroller.insertBefore(card, anchor); // sempre prima dello spacer finale
-      });
-
-
-      // Reset scroll all’inizio dello step
+      // Reset scroll step
       scroller.scrollTo({ left: 0 });
 
-      // Re-bind pulsanti "Configura"/"Scegli"
+      // Bind CTA
       scroller.querySelectorAll('ds-button[slot="cta"]').forEach(btn => {
-        btn.addEventListener('ds-select', (e) => {
+        btn.addEventListener('ds-select', () => {
           const val = btn.getAttribute('value');
           this._handleSelect(step.key, val);
         });
       });
 
-      // Aggiorna tabs
       this._renderTabs();
-      // Aggiorna scaling/spacer
       this._queueUpdate();
     }
 
@@ -307,7 +297,6 @@
       if (item.price) el.setAttribute('price', item.price);
       if (item.desc)  el.setAttribute('description', item.desc);
 
-      // CTA text cambia a seconda dello step
       const cta = document.createElement('ds-button');
       cta.setAttribute('slot', 'cta');
       cta.setAttribute('size', 'md');
@@ -342,19 +331,13 @@
 
     // ---------- Selezione & Navigazione ----------
     _handleSelect(stepKey, value) {
-      if (stepKey === 'cibo') {
-        // Solo uno selezionabile: sovrascrive eventuale scelta precedente
-        this._selections.cibo = value;
-      } else {
-        this._selections[stepKey] = value;
-      }
+      if (stepKey === 'cibo') this._selections.cibo = value; // single-select
+      else this._selections[stepKey] = value;
 
-      // Avanza di step o completa
       if (this._currentStep < this._steps.length - 1) {
         this._currentStep++;
         this._renderStep();
       } else {
-        // Fine: dispatch evento con tutte le selezioni
         const ev = new CustomEvent('form-complete', {
           bubbles: true,
           composed: true,
@@ -363,15 +346,13 @@
         this.dispatchEvent(ev);
       }
     }
-
     _isStepDone(index) {
       const key = this._steps[index].key;
       return !!this._selections[key];
     }
 
-    // ---------- Scroll FX (scaling + spacer dinamici) ----------
+    // ---------- Scroll FX ----------
     _onScroll() { this._queueUpdate(); }
-
     _queueUpdate() {
       if (this._raf) return;
       this._raf = requestAnimationFrame(() => {
@@ -383,8 +364,7 @@
 
     _updateSpacers() {
       const scroller = this.shadowRoot.getElementById('scroller');
-      const items = Array.from(scroller.children)
-        .filter(el => el.tagName && el.tagName.includes('-'));
+      const items = Array.from(scroller.children).filter(el => el.tagName && el.tagName.includes('-'));
       if (!items.length) return;
 
       const hostRect = scroller.getBoundingClientRect();
@@ -416,8 +396,7 @@
       const sMax = parseFloat(cs.getPropertyValue('--scale-max')) || 1.06;
       const oMin = parseFloat(cs.getPropertyValue('--opacity-min')) || 0.9;
 
-      const children = Array.from(scroller.children)
-        .filter(el => el.tagName && el.tagName.includes('-'));
+      const children = Array.from(scroller.children).filter(el => el.tagName && el.tagName.includes('-'));
 
       let best = null, bestDist = Infinity;
 
@@ -441,7 +420,6 @@
         if (dist < bestDist) { bestDist = dist; best = el; }
       }
 
-      // flag "data-active" (se ti serve per stili extra)
       if (best) {
         for (const el of children) {
           if (el === best) el.setAttribute('data-active', '');
