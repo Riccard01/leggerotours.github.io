@@ -95,8 +95,8 @@
 
           /* Outline */
           :host::after{
-            content:""; position:absolute; inset:0; border-radius:inherit; outline:3px solid rgba(255,255,255,.6);
-            outline-offset:-3px; mix-blend-mode:overlay; pointer-events:none; z-index:6;
+            content:""; position:absolute; inset:0; border-radius:inherit; outline:2px solid rgba(255,255,255,.3);
+            outline-offset:-2px; mix-blend-mode:overlay; pointer-events:none; z-index:6;
           }
 
           .clip{ position:absolute; inset:0; overflow:hidden; border-radius:inherit; }

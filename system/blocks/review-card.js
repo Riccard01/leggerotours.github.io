@@ -112,7 +112,7 @@
           }
 
           :host::after{
-            content:""; position:absolute; inset:0; border-radius:inherit; outline:2px solid rgba(255,255,255,.45); outline-offset:-3px; mix-blend-mode:overlay; pointer-events:none; z-index:8;
+            content:""; position:absolute; inset:0; border-radius:inherit; outline:2px solid rgba(255,255,255,.3); outline-offset:-2px; mix-blend-mode:overlay; pointer-events:none; z-index:8;
           }
 
           .bubble{ position:absolute; max-width:72%; top:16px; right:16px; padding:10px 12px; border-radius:14px; background:rgba(255,255,255,.96); color:#0b1220;
@@ -136,7 +136,7 @@
 
           .bg{ position:absolute; inset:0; background-size:cover; background-position:center; z-index:0; }
           .progress{ position:absolute; top:8px; left:8px; right:8px; display:grid; grid-auto-flow:column; gap:6px; z-index:4; pointer-events:none; }
-          .bar{ height:3px; background:rgba(255,255,255,.35); border-radius:999px; overflow:hidden; }
+          .bar{ height:3px; background:rgba(212, 39, 39, 0.35); border-radius:999px; overflow:hidden; }
           .bar>i{ display:block; height:100%; width:0%; background:rgba(255,255,255,.95); transition:width .2s linear; }
           .bar[data-done="true"]>i{ width:100%; }
 
