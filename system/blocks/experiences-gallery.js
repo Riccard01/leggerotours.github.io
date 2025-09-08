@@ -103,7 +103,6 @@
         <ds-button slot="cta" value="rainbow-2" variant="with-icon-light" size="md" full>
           <span slot="text">Configura</span>
         </ds-button>
-        <story-badge src="/assets/images/camogli.jpg" label="Tappe" size="56" duration="2600"></story-badge>
       </experience-card>
 
       <experience-card
@@ -117,7 +116,6 @@
         <ds-button slot="cta" value="gourmet" variant="with-icon-light" size="md" full>
           <span slot="text">Configura</span>
         </ds-button>
-        <story-badge src="/assets/images/camogli.jpg" label="Tappe" size="56" duration="2600"></story-badge>
       </experience-card>
 
       <experience-card
@@ -131,7 +129,6 @@
         <ds-button slot="cta" value="stella-maris" variant="with-icon-light" size="md" full>
           <span slot="text">Configura</span>
         </ds-button>
-        <story-badge src="/assets/images/camogli.jpg" label="Tappe" size="56" duration="2600"></story-badge>
       </experience-card>
 
       <experience-card
@@ -145,7 +142,6 @@
         <ds-button slot="cta" value="fireworks" variant="with-icon-light" size="md" full>
           <span slot="text">Configura</span>
         </ds-button>
-        <story-badge src="/assets/images/camogli.jpg" label="Tappe" size="56" duration="2600"></story-badge>
       </experience-card>
 
       <experience-card
