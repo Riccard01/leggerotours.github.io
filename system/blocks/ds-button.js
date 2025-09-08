@@ -1,4 +1,4 @@
-// /system/blocks/ds-button.js (FIXED v2: solid event dispatch + a11y)
+// /system/blocks/ds-button.js (FIXED v2: solid event dispatch + a11y + overlay variant)
 (() => {
   if (customElements.get('ds-button')) return;
 
@@ -17,7 +17,8 @@
       const v = (this.getAttribute('variant')||'solid-dark').toLowerCase();
       return [
         'solid-dark','solid-light','outline','ghost',
-        'with-icon-light','with-icon-ghost'
+        'with-icon-light','with-icon-ghost',
+        'overlay' // <--- nuovo variant
       ].includes(v) ? v : 'solid-dark';
     }
     get size(){
@@ -93,7 +94,7 @@
             font-weight: 700;
             font-size: var(--font-md, 16px);
             line-height: 1;
-            transition: transform .04s linear, background-color .15s ease, color .15s ease, border-color .15s ease;
+            transition: transform .04s linear, background-color .15s ease, color .15s ease, border-color .15s ease, opacity .15s ease, box-shadow .2s ease;
           }
           .btn:active { transform: translateY(1px); }
           .btn[disabled],
@@ -131,6 +132,23 @@
 
           .btn[data-variant="with-icon-ghost"]{ color:#0b1220; background:transparent; border-color:#d1d5db; }
           .btn[data-variant="with-icon-ghost"]:hover:not([disabled]){ background:#f3f4f6; border-color:#cbd5e1; }
+
+          /* NEW: overlay (semi-trasparente, interattivo) */
+          .btn[data-variant="overlay"]{
+            color:#fff;
+            background: rgba(15, 23, 42, .55); /* ~55% opaco su sfondo scuro */
+            border-color: rgba(255,255,255,.25);
+            box-shadow: 0 6px 18px rgba(0,0,0,.25);
+            backdrop-filter: saturate(140%) blur(8px);
+          }
+          .btn[data-variant="overlay"]:hover:not([disabled]){
+            background: rgba(15, 23, 42, .75);
+            border-color: rgba(255,255,255,.35);
+          }
+          .btn[data-variant="overlay"]:focus-visible{
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(99,102,241,.6);
+          }
 
           .inner { display:inline-flex; align-items:center; gap:8px; }
           ::slotted([slot="text"]){ line-height:1; }

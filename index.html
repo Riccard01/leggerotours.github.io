@@ -267,5 +267,15 @@ And the boat was very safe, he had all of the safety equipments ready if anythin
 
   </progress-form> -->
 
+<script>
+  document.querySelector('experiences-gallery')
+  .addEventListener('form-complete', (e) => {
+    console.log('Scelte finali:', e.detail);
+    // e.detail = { esperienza: 'rainbow', barca: 'rib', cibo: 'crudo', porto: 'camogli' }
+  });
+
+</script>
+
+
 </body>
 </html>
