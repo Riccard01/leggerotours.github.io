@@ -153,3 +153,82 @@ story-touch-overlay{
 .reviews-section {
   margin-bottom: -7rem;
 }
+
+/* === Patch: titoli/descrizioni sezioni più stretti + margine esterno descrizioni === */
+
+/* Titoli più stretti (circa 16–22 caratteri di larghezza visiva) */
+/* Sezioni principali */
+.reviews-title,
+.exp-title{
+  font-size: clamp(1.6rem, 2vw + 0.7rem, 2rem);       /* ≈ da 25px a 32px */
+  line-height: 1.18;
+}
+/* Se usi .title-2xl in giro */
+.title-2xl{
+  font-size: clamp(1.25rem, 1.2vw + 0.9rem, 1.75rem); /* ≈ da 20px a 28px */
+  line-height: 1.2;
+}
+/* Descrizioni più strette + respiro laterale */
+.reviews-subtitle,
+.exp-subtitle {
+  /* più strette e leggibili */
+  max-width: clamp(36ch, 68vw, 52ch);
+
+  /* centratura + spacing verticale */
+  margin: 0 auto 2.25rem;
+
+  /* “margine esterno” laterale senza rompere la centratura */
+  padding-inline: clamp(12px, 4vw, 28px);
+}
+
+/* Header delle sezioni con un filo di padding orizzontale */
+.reviews-header,
+.exp-header {
+  max-width: min(92vw, 720px);
+  padding-inline: clamp(8px, 3vw, 20px);
+}
+
+/* Mobile: stringi un po’ di più le descrizioni */
+@media (max-width: 560px) {
+  .reviews-subtitle,
+  .exp-subtitle {
+    max-width: 42ch;
+    padding-inline: clamp(14px, 5vw, 24px);
+    margin-bottom: 2rem;
+  }
+
+  .reviews-title,
+  .exp-title{
+    font-size: clamp(1.4rem, 5vw, 1.75rem);           /* ≈ da 22px a 28px */
+  }
+}
+
+
+/* === Descrizioni sezioni più piccole (responsive) === */
+.reviews-subtitle,
+.exp-subtitle{
+  font-size: clamp(0.95rem, 1vw + 0.65rem, 1.075rem); /* ~15.2px → 17.2px */
+  line-height: 1.55;
+}
+
+/* Paragrafi grandi generici (se usati come descrizioni) */
+.body-lg{
+  font-size: clamp(0.95rem, 0.9vw + 0.7rem, 1.075rem);
+  line-height: 1.55;
+}
+
+/* Mobile: ancora un filo più compatte */
+@media (max-width: 560px){
+  .reviews-subtitle,
+  .exp-subtitle,
+  .body-lg{
+    font-size: clamp(0.92rem, 3.8vw, 1.02rem);
+    line-height: 1.5;
+  }
+}
+
+
+
+.exp-section {
+  margin-bottom: -5rem;
+}
