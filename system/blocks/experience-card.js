@@ -38,11 +38,11 @@
         <style>
           :host{
             /* controlli glow */
-            --glow-dur:.62s;
+            --glow-dur:.30s;
             --glow-rgb:0,160,255;
 
             inline-size: var(--card-w, 220px);
-            display:flex; aspect-ratio:9/16; border-radius:16px;
+            display:flex; border-radius:16px;
             position:relative; overflow:visible;
             transform:scale(var(--s,1));
             transform-origin:center center;
@@ -50,12 +50,13 @@
             background:#0b1220; color:#fff;
             font-family:system-ui, sans-serif; box-shadow:0 10px 30px rgba(0,0,0,.35);
             will-change: transform;
-            width: 300px;
+            aspect-ratio:9/16;
+            width: 200px;
           }
 
           /* Hover zoom SOLO su device con hover reale (desktop) */
           @media (hover: hover) and (pointer: fine){
-            :host(:hover){ transform: scale(1.03); }
+            :host(:hover){ transform: scale(1.07); }
           }
 
           /* Su mobile: la card attiva (centrata) si ingrandisce */
@@ -68,7 +69,7 @@
             content:""; position:absolute; inset:0; border-radius:inherit; pointer-events:none;
             /* sopra .bg/overlay/feather (z=0/2), sotto contenuti (z=5) e outline (z=6) */
             z-index:3;
-            opacity:0; transform:scale(.9);
+            opacity:0; transform:scale(1);
             /* gradient interno + glow esterno verso il basso + un filo dentro */
             background:
               radial-gradient(82% 72% at 50% 106%, rgba(var(--glow-rgb),.34) 0%, rgba(var(--glow-rgb),.16) 40%, rgba(0,0,0,0) 70%);

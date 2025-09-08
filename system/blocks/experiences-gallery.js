@@ -121,20 +121,6 @@
       </experience-card>
 
       <experience-card
-        id="exp-4"
-        price="€250 per group"
-        image="./assets/images/dolphin.jpg"
-        title="Dolphin Watching"
-        description="Avvistamento dei delfini nel loro habitat naturale."
-        tag="Mezza giornata"
-        cta="Configura">
-        <ds-button slot="cta" value="dolphin" variant="with-icon-light" size="md" full>
-          <span slot="text">Configura</span>
-        </ds-button>
-        <story-badge src="/assets/images/camogli.jpg" label="Tappe" size="56" duration="2600"></story-badge>
-      </experience-card>
-
-      <experience-card
         id="exp-5"
         price="€1200 per group"
         image="./assets/images/special.jpg"
