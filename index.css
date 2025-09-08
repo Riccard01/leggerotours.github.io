@@ -4,10 +4,12 @@ body {
     align-items: center;
     flex-direction: column;
     padding: 0;
-    margin: 16px;
+    margin: 0;
     overflow-x: hidden;
     background-color: #13161F;
-    height: 32000px
+    height: 32000px;
+    font-family: var(--font-sans, "Plus Jakarta Sans", system-ui, sans-serif);
+    font-weight: var(--weight-regular, 400);
 }
 
 section {
@@ -27,14 +29,6 @@ section {
   -moz-user-select: none;
   -ms-user-select: none;
   user-select: none;
-}
-
-/* Font di base per tutta la pagina */
-html, body {
-  font-family: var(--font-sans, "Plus Jakarta Sans", system-ui, sans-serif);
-  font-weight: var(--weight-regular, 400);
-  margin: 0;
-  padding: 0;
 }
 
 /* Titoli */
