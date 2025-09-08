@@ -1,10 +1,15 @@
 // /system/blocks/experiences-gallery.js
 // Form a step: Esperienza -> Barca -> Cibo (1 sola) -> Porto
-// - Tabs "classy" sotto al sottotitolo, non sticky/fixed
+// - Tabs stile "tag", non sticky
 // - Scroll orizzontale con snap + scaling graduale
+// - Animazioni di comparsa/scomparsa con leggero delay (stagger)
 // - Emissione finale "form-complete"
 (() => {
   if (customElements.get('experiences-gallery')) return;
+
+  const ENTER_DUR = 280; // ms
+  const EXIT_DUR  = 180; // ms
+  const STAGGER   = 60;  // ms tra una card e la successiva
 
   class ExperiencesGallery extends HTMLElement {
     constructor() {
@@ -12,6 +17,7 @@
       this.attachShadow({ mode: 'open' });
       this._onScroll = this._onScroll.bind(this);
       this._raf = null;
+      this._renderToken = 0; // per evitare race tra step rapidi
 
       // Stato del form
       this._steps = [
@@ -23,7 +29,7 @@
       this._currentStep = 0;
       this._selections = { esperienza: null, barca: null, cibo: null, porto: null };
 
-      // Dati demo
+      // Dati demo (mix reali + placeholder)
       this._data = {
         esperienza: [
           { id:'rainbow', title:'The Rainbow Tour', price:'€570 per group', img:'./assets/images/portofino.jpg',   desc:'Esplora baie segrete da Punta Chiappa a Portofino.' },
@@ -50,103 +56,74 @@
 
       this.shadowRoot.innerHTML = `
         <style>
-:host {
-  /* tuning effetti */
-  --falloff: 260px;
-  --scale-min: 0.92;
-  --scale-max: 1.06;
-  --opacity-min: 0.9;
+          :host {
+            /* FX scroller */
+            --falloff: 260px;
+            --scale-min: 0.92;
+            --scale-max: 1.06;
+            --opacity-min: 0.9;
 
-  --gap: 32px;
+            --gap: 32px;
 
-  /* ✅ padding separati */
-  --pad-inline: 16px;     /* left & right */
-  --pad-top: 1rem;        /* top mobile di default */
-  --pad-bottom: 7rem;     /* bottom */
+            /* padding separati (puoi override da fuori) */
+            --pad-inline: 16px;
+            --pad-top: 7rem;
+            --pad-bottom: 16px;
+            --pad-top-desktop: 4rem;
 
-  /* (opzionale) override desktop */
-  --pad-top-desktop: 4rem;
+            /* animazioni */
+            --enter-dur: ${ENTER_DUR}ms;
+            --exit-dur:  ${EXIT_DUR}ms;
+            --stagger:   ${STAGGER}ms;
 
-  display: block;
-  width: 100%;
-  box-sizing: border-box;
-}
-
+            display: block;
+            width: 100%;
+            box-sizing: border-box;
+          }
 
           /* Headline step */
           .headline {
-            margin: 16px 16px 6px;
+            margin: 16px var(--pad-inline) 6px;
             font: 700 18px/1.3 system-ui, sans-serif;
-            color: var(--tabs-fg-active);
+            color: #fff;
           }
 
-          /* Breadcrumbs (non sticky, senza sfondo contenitore) */
-          .tabs {
-            position: static;      /* NON sticky/fixed */
-            background: transparent;
-            backdrop-filter: none;
-            padding: 6px 12px 10px;
-            border-bottom: 1px solid var(--tabs-divider);
-          }
+          /* ── BREADCRUMBS stile "tag" (nessun padding/margin al container) ── */
+          .tabs { position: static; background: transparent; border: none; padding: 0; margin: 0 var(--pad-inline) 8px; }
           .tabs .row {
-            display: grid;
-            grid-template-columns: repeat(4, auto);
-            gap: 18px;
-            align-items: center;
-            justify-content: flex-start;
+            display: flex; gap: 8px; align-items: center; justify-content: center; flex-wrap: wrap;
           }
           .tab {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            padding: 4px 0;
-            font: 600 14px/1.4 "Plus Jakarta Sans", system-ui, sans-serif;
-            color: var(--tabs-fg-dim);
-            background: transparent;
-            border: none;
-            border-radius: 0;
-            cursor: pointer;
-            user-select: none;
-            transition: color .15s ease;
+            display: inline-flex; align-items: center; justify-content: center; gap: 4px;
+            padding: 4px 10px;
+            font: 600 13px/1.2 "Plus Jakarta Sans", system-ui, sans-serif;
+            color: #fff;
+            background: rgba(37, 99, 235, 0.25);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            border-radius: 999px;
+            cursor: pointer; user-select: none;
+            transition: background .15s ease, border-color .15s ease, opacity .15s ease;
           }
-          .tab:hover:not([aria-disabled="true"]) { color: var(--tabs-fg-active); text-decoration: underline; }
-          .tab[data-active="true"] { color: var(--tabs-fg-active); }
-          .tab[aria-disabled="true"] { opacity: .45; cursor: default; }
-
-          .tab[data-done="true"]::after {
-            content: "✓";
-            font-weight: 700;
-            margin-left: 6px;
-            font-size: 13px;
-            color: currentColor;
-          }
+          .tab:hover:not([aria-disabled="true"]) { background: rgba(37,99,235,.35); border-color: rgba(255,255,255,.35); }
+          .tab[data-active="true"] { background: rgba(37,99,235,.45); border-color: rgba(255,255,255,.45); }
+          .tab[data-done="true"]::after { content: "✓"; font-weight: 700; margin-left: 4px; font-size: 12px; color: currentColor; }
+          .tab[aria-disabled="true"] { opacity: .5; cursor: default; }
 
           /* Wrapper scroller */
           .wrap { position: relative; }
 
           /* Scroller orizzontale con snap */
-.scroller {
-  display: flex;
-  flex-direction: row;
-  gap: var(--gap);
+          .scroller {
+            display: flex; flex-direction: row; gap: var(--gap);
+            padding: var(--pad-top) var(--pad-inline) var(--pad-bottom) var(--pad-inline);
+            width: 100%; box-sizing: border-box;
 
-  /* ✅ padding separati */
-  padding: var(--pad-top) var(--pad-inline) var(--pad-bottom) var(--pad-inline);
-
-  width: 100%;
-  box-sizing: border-box;
-  overflow-x: auto;
-  overflow-y: hidden;
-  -webkit-overflow-scrolling: touch;
-  scroll-snap-type: x mandatory;
-}
-
-          .scroller::-webkit-scrollbar { display: none; }
-          .scroller > * {
-            flex: 0 0 auto;
-            scroll-snap-align: center;
-            scroll-snap-stop: normal;
+            overflow-x: auto; overflow-y: hidden;
+            -webkit-overflow-scrolling: touch;
+            scroll-snap-type: x mandatory;
           }
+          .scroller::-webkit-scrollbar { display: none; }
+          .scroller > * { flex: 0 0 auto; scroll-snap-align: center; scroll-snap-stop: normal; }
 
           /* Card: scaling/shine */
           .scroller > :not(.spacer) {
@@ -158,8 +135,7 @@
             z-index: var(--_z, 0);
           }
           .scroller > :not(.spacer)::after {
-            content: "";
-            position: absolute; inset: 0; border-radius: inherit; pointer-events: none;
+            content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none;
             background-image: linear-gradient(60deg,
               rgba(255,255,255,0) 0%,
               rgba(255,255,255,0.06) 40%,
@@ -171,25 +147,37 @@
           }
 
           /* spacer ai lati (dinamici in JS) */
-          .spacer {
-            display: block;
-            flex: 0 0 12px;
-            scroll-snap-align: none;
-            pointer-events: none;
+          .spacer { display: block; flex: 0 0 12px; scroll-snap-align: none; pointer-events: none; }
+
+          /* ── Animazioni (entrata/uscita) ───────────────────────── */
+          @keyframes card-in {
+            from { opacity: 0; transform: translateY(8px) scale(.985); }
+            to   { opacity: 1; transform: translateY(0)    scale(1); }
+          }
+          @keyframes card-out {
+            to   { opacity: 0; transform: translateY(8px) scale(.985); }
+          }
+          .card-enter {
+            animation: card-in var(--enter-dur) cubic-bezier(.2,.7,.2,1) both;
+            animation-delay: calc(var(--stagger-idx, 0) * var(--stagger));
+          }
+          .card-leave {
+            animation: card-out var(--exit-dur) ease both;
+            animation-delay: calc(var(--stagger-idx, 0) * var(--stagger));
           }
 
-@media (min-width: 501px) {
-  .scroller {
-    /* ✅ top desktop separato */
-    padding-top: var(--pad-top-desktop);
-  }
-}
+          /* Rispetto riduzione movimento */
+          @media (prefers-reduced-motion: reduce) {
+            .card-enter, .card-leave { animation: none !important; }
+          }
 
+          @media (min-width: 501px) {
+            .scroller { padding-top: var(--pad-top-desktop); }
+          }
         </style>
 
         <div class="headline" id="headline"></div>
 
-        <!-- BREADCRUMBS: ora sotto il sottotitolo, non sticky -->
         <div class="tabs" role="tablist" aria-label="Percorso prenotazione">
           <div class="row" id="tabsRow"></div>
         </div>
@@ -241,7 +229,6 @@
         b.dataset.done = done ? 'true' : 'false';
         b.dataset.active = (i === this._currentStep) ? 'true' : 'false';
         b.setAttribute('aria-selected', i === this._currentStep ? 'true' : 'false');
-
         if (i > this._currentStep && !done) b.setAttribute('aria-disabled', 'true');
 
         b.addEventListener('click', () => {
@@ -256,22 +243,39 @@
       });
     }
 
-    _renderStep() {
+    async _renderStep() {
       const head = this.shadowRoot.getElementById('headline');
       const step = this._steps[this._currentStep];
       const scroller = this.shadowRoot.getElementById('scroller');
+      const token = ++this._renderToken;
 
       head.textContent = this._headlineFor(step.key);
 
-      // Pulisci le card, lascia gli spacer
-      const nodes = Array.from(scroller.children).filter(n => !n.classList.contains('spacer'));
-      nodes.forEach(n => n.remove());
+      // 1) Anima via le card correnti (non spacer)
+      const leaving = Array.from(scroller.children).filter(n => !n.classList.contains('spacer'));
+      if (leaving.length) {
+        leaving.forEach((el, i) => {
+          el.classList.remove('card-enter');
+          el.style.setProperty('--stagger-idx', i.toString());
+          el.classList.add('card-leave');
+        });
 
-      // Inserisci card nell'ordine corretto (sempre prima dello spacer finale)
+        // attesa complessiva (exit dur + ultimo delay)
+        await this._wait(EXIT_DUR + (leaving.length - 1) * STAGGER + 20);
+        if (token !== this._renderToken) return; // se è cambiato step nel frattempo, abort
+        leaving.forEach(n => n.remove());
+      }
+
+      // 2) Inserisci le nuove card e anima ingresso con stagger
       const items = this._data[step.key] || [];
       const anchor = scroller.lastElementChild; // spacer finale
       const frag = document.createDocumentFragment();
-      items.forEach(item => frag.appendChild(this._createCard(step.key, item)));
+      items.forEach((item, idx) => {
+        const card = this._createCard(step.key, item);
+        card.classList.add('card-enter');
+        card.style.setProperty('--stagger-idx', idx.toString());
+        frag.appendChild(card);
+      });
       scroller.insertBefore(frag, anchor);
 
       // Reset scroll step
@@ -286,7 +290,13 @@
       });
 
       this._renderTabs();
+
+      // 3) Aggiorna FX e rimuovi classi 'card-enter' dopo anim
       this._queueUpdate();
+      setTimeout(() => {
+        if (token !== this._renderToken) return;
+        scroller.querySelectorAll('.card-enter').forEach(el => el.classList.remove('card-enter'));
+      }, ENTER_DUR + (items.length - 1) * STAGGER + 20);
     }
 
     _createCard(stepKey, item) {
@@ -436,6 +446,8 @@
       if (String(val).includes('px') || !isNaN(num)) return num || 0;
       return 0;
     }
+
+    _wait(ms) { return new Promise(r => setTimeout(r, ms)); }
   }
 
   customElements.define('experiences-gallery', ExperiencesGallery);
