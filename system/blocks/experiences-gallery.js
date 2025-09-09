@@ -23,7 +23,7 @@
       this._renderToken = 0;
 
       // Typewriter
-      this._typeSpeed = 42; // ms per carattere (modifica qui per cambiare velocità)
+      this._typeSpeed = 10; // ms per carattere (modifica qui per cambiare velocità)
       this._twTimer = null;
 
       // Stato del form
