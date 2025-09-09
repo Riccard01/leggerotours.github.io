@@ -1,9 +1,10 @@
 // /system/blocks/experiences-gallery.js
 // Form a step: Esperienza -> Barca -> Cibo (1 sola) -> Porto
-// - Tabs stile "tag" (dark, attivo/completato bianco)
+// - Tabs stile "tag" (dark, attivo/done bianco)
 // - Scroll orizzontale con snap + scaling graduale
 // - Animazioni di comparsa/scomparsa con leggero delay (stagger)
 // - Dots/pallini sotto le card
+// - Typewriter sul titolo (senza caret), centrato e stabile
 // - Emissione finale "form-complete"
 (() => {
   if (customElements.get('experiences-gallery')) return;
@@ -16,9 +17,14 @@
     constructor() {
       super();
       this.attachShadow({ mode: 'open' });
+
       this._onScroll = this._onScroll.bind(this);
       this._raf = null;
       this._renderToken = 0;
+
+      // Typewriter
+      this._typeSpeed = 42; // ms per carattere (modifica qui per cambiare velocità)
+      this._twTimer = null;
 
       // Stato del form
       this._steps = [
@@ -45,7 +51,7 @@
         ],
         cibo: [
           { id:'focaccia', title:'Prosciutto e melone',          price:'+ €30', img:'./assets/images/melone.jpg',   desc:'Tipico ligure.' },
-          { id:'crudo',    title:'Insalata di anguria e cipolle',price:'+ €80', img:'./assets/images/anguria.jpg',  desc:'Selezione del giorno.' },
+          { id:'crudo',    title:'Insalata di anguria e cipolle', price:'+ €80', img:'./assets/images/anguria.jpg',  desc:'Selezione del giorno.' },
           { id:'veget',    title:'Vegetariano',                  price:'+ €25', img:'./assets/images/couscous.jpg', desc:'Fresco e leggero.' },
         ],
         porto: [
@@ -80,32 +86,42 @@
             display: block;
             width: 100%;
             box-sizing: border-box;
-
-            /* FONT: Plus Jakarta ovunque nel componente */
             font-family: var(--font-sans, "Plus Jakarta Sans", system-ui, sans-serif);
-            -webkit-font-smoothing: antialiased;
-            text-rendering: optimizeLegibility;
           }
 
-          /* Headline step */
-          .headline {
-            margin: 16px var(--pad-inline) 24px;
+          /* Headline (gradient Apple-like, centrato, stabile) */
+          .headline{
+            margin: 16px var(--pad-inline) 12px;
+            font-family: var(--font-sans, "Plus Jakarta Sans", system-ui, sans-serif);
             font-weight: 700;
-            font-size: 18px;
-            line-height: 1.3;
-            color: #fff;
+            font-size: 1.4rem;
+            line-height: 1.2;
             text-align: center;
-            font-family: var(--font-sans, "Plus Jakarta Sans", system-ui, sans-serif);
+
+            /* stile Apple index */
+            background: linear-gradient(to bottom, #ffffff 0%, #ebebeb 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            color: transparent;
+            text-shadow: 0 2px 6px rgba(0,0,0,0.25);
+
+            min-height: 1.4em; /* evita salti */
+          }
+          .headline #tw{
+            display: inline-block;
+            white-space: nowrap; /* nessun wrap -> niente shift */
           }
 
-          /* Tabs stile tag (dark, attivo/completato bianco) */
+          /* Tabs stile tag (dark, attivo/done bianco) */
           .tabs { position: static; background: transparent; border: none; padding: 0; margin: 0 var(--pad-inline) 8px; }
           .tabs .row {
             display: flex; gap: 8px; align-items: center; justify-content: center; flex-wrap: wrap;
           }
           .tab {
             display: inline-flex; align-items: center; justify-content: center; gap: 4px;
-            padding: 3px 10px;                      /* breadcrumb-ish */
+            padding: 3px 10px; /* breadcrumb-like */
+            font-family: var(--font-sans, "Plus Jakarta Sans", system-ui, sans-serif);
             font-weight: 600; font-size: 13px; line-height: 1.1;
             color: #e8eef8;
             background: rgba(255,255,255,0.06);
@@ -113,24 +129,23 @@
             border-radius: 999px;
             cursor: pointer; user-select: none;
             transition: background .15s ease, border-color .15s ease, color .15s ease, opacity .15s ease;
-            font-family: var(--font-sans, "Plus Jakarta Sans", system-ui, sans-serif);
           }
           .tab:hover:not([aria-disabled="true"]) { background: rgba(255,255,255,.10); }
           .tab[aria-disabled="true"] { opacity: .5; cursor: default; }
 
-          /* ATTIVO = bianco */
+          /* attivo */
           .tab[aria-selected="true"],
           .tab[data-active="true"] {
             background: #fff;
             color: #0b1220;
             border-color: transparent;
           }
-          /* COMPLETATO = resta bianco */
-          .tab[data-done="true"] {
+          /* completati: restano bianchi */
+          .tab[data-done="true"]{
             background: #fff;
             color: #0b1220;
             border-color: transparent;
-            opacity: 1;
+            opacity: .95;
           }
 
           /* Wrapper scroller */
@@ -189,9 +204,10 @@
           .dot[aria-current="true"]{
             background: #fff; opacity: 1; transform: scale(1.25);
           }
+
           @media (min-width: 501px){
             .scroller { padding-top: var(--pad-top-desktop); }
-            .dots{ bottom: 32px; }
+            .dots{ bottom: 32px; } /* più vicino alle card su desktop */
           }
 
           /* Animazioni (entrata/uscita) */
@@ -205,7 +221,9 @@
           }
         </style>
 
-        <div class="headline" id="headline"></div>
+        <h2 class="headline" id="headline" aria-live="polite" aria-atomic="true">
+          <span id="tw"></span>
+        </h2>
 
         <div class="tabs" role="tablist" aria-label="Percorso prenotazione">
           <div class="row" id="tabsRow"></div>
@@ -240,6 +258,7 @@
       scroller?.removeEventListener('scroll', this._onScroll);
       this._ro?.disconnect();
       if (this._raf) cancelAnimationFrame(this._raf);
+      if (this._twTimer) { clearTimeout(this._twTimer); this._twTimer = null; }
     }
 
     // ---------- UI Rendering ----------
@@ -273,12 +292,9 @@
     }
 
     async _renderStep() {
-      const head = this.shadowRoot.getElementById('headline');
       const step = this._steps[this._currentStep];
       const scroller = this.shadowRoot.getElementById('scroller');
       const token = ++this._renderToken;
-
-      head.textContent = this._headlineFor(step.key);
 
       // 1) Anima via le card correnti (non spacer)
       const leaving = Array.from(scroller.children).filter(n => !n.classList.contains('spacer'));
@@ -309,10 +325,15 @@
       // Dots per il nuovo step
       this._renderDots(items.length);
 
-      // Reset scroll step
-      scroller.scrollTo({ left: 0 });
+      // Reset scroll step + update spacers per centrare PERFETTAMENTE
+      // (senza sottrarre gap: lo spacer deve essere (host - card)/2)
+      requestAnimationFrame(() => {
+        this._updateSpacers();
+        scroller.scrollTo({ left: 0 });
+        this._queueUpdate();
+      });
 
-      // Bind CTA
+      // CTA
       scroller.querySelectorAll('ds-button[slot="cta"]').forEach(btn => {
         btn.addEventListener('ds-select', () => {
           const val = btn.getAttribute('value');
@@ -320,10 +341,13 @@
         });
       });
 
+      // Tabs
       this._renderTabs();
 
-      // 3) Aggiorna FX e ripulisci classi 'card-enter' a fine anim
-      this._queueUpdate();
+      // Titolo typewriter (dopo che le card sono inserite)
+      this._typeHeadline(this._headlineFor(step.key));
+
+      // Ripulisci classi 'card-enter' a fine anim
       setTimeout(() => {
         if (token !== this._renderToken) return;
         scroller.querySelectorAll('.card-enter').forEach(el => el.classList.remove('card-enter'));
@@ -367,6 +391,25 @@
         case 'cibo':       return 'Scegli il cibo (1 solo)';
         case 'porto':      return 'Scegli il porto di partenza';
         default:           return '';
+      }
+    }
+
+    // ---------- Typewriter (senza caret) ----------
+    _typeHeadline(text){
+      const tw = this.shadowRoot.getElementById('tw');
+      if (!tw) return;
+      if (this._twTimer) { clearTimeout(this._twTimer); this._twTimer = null; }
+      tw.textContent = '';
+      // start dopo un frame per non competere con il repaint delle card
+      requestAnimationFrame(() => this._typewriteStep(tw, text, 0));
+    }
+    _typewriteStep(tw, text, i){
+      if (i > text.length) return;
+      tw.textContent = text.slice(0, i);
+      if (i < text.length){
+        this._twTimer = setTimeout(() => this._typewriteStep(tw, text, i+1), this._typeSpeed);
+      } else {
+        this._twTimer = null;
       }
     }
 
@@ -415,11 +458,9 @@
       const lastRect  = items[items.length - 1].getBoundingClientRect();
       if (firstRect.width === 0 || lastRect.width === 0) return;
 
-      const cs = getComputedStyle(scroller);
-      const gapPx = this._toPx(cs.getPropertyValue('gap') || '0');
-
-      const leftNeeded  = Math.max(12, (hostRect.width / 2) - (firstRect.width / 2) - gapPx);
-      const rightNeeded = Math.max(12, (hostRect.width / 2) - (lastRect.width  / 2) - gapPx);
+      // Fix centratura: nessuna sottrazione del gap!
+      const leftNeeded  = Math.max(12, (hostRect.width - firstRect.width) / 2);
+      const rightNeeded = Math.max(12, (hostRect.width - lastRect.width)  / 2);
 
       const spacers = Array.from(scroller.querySelectorAll('.spacer'));
       if (spacers[0]) spacers[0].style.flexBasis = `${Math.round(leftNeeded)}px`;
@@ -482,7 +523,6 @@
         d.setAttribute('role','presentation');
         dots.appendChild(d);
       }
-      // set iniziale
       this._updateDots(0);
     }
 
