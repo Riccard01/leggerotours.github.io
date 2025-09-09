@@ -6,7 +6,7 @@
   const ENTER_DUR = 280; // ms
   const EXIT_DUR  = 180; // ms
   const STAGGER   = 60;  // ms tra una card e la successiva
-  const TYPE_SPEED = 26; // ms per carattere nel titolo
+  const TYPE_SPEED = 10; // ms per carattere nel titolo
 
   class ExperiencesGallery extends HTMLElement {
     constructor() {
