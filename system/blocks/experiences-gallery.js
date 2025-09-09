@@ -79,17 +79,26 @@
           }
 
           /* Headline step (Plus Jakarta Sans) */
-          .headline {
-            margin: 16px var(--pad-inline) 6px;
-            font-family: var(--font-sans, "Plus Jakarta Sans", system-ui, sans-serif);
-            font-weight: 700;
-            font-size: clamp(18px, 1.3rem, 22px);
-            line-height: 1.3;
-            color: #fff;
-            text-align: center;
-            min-height: 1.6em; /* evita "saltelli" durante typing */
-            letter-spacing: .2px;
-          }
+/* Titolo typewriter in stile Apple, uguale alle sezioni dell'index */
+.headline{
+  font-family: var(--font-sans, "Plus Jakarta Sans", system-ui, sans-serif);
+  font-weight: 700;
+  font-size: clamp(1.4rem, 2vw + 0.7rem, 2rem); /* stessa scala di .exp-title/.reviews-title */
+  line-height: 1.2;
+  text-align: center;
+  margin: 0 var(--pad-inline) 24px;
+
+  /* sfumatura + riempimento trasparente */
+  background: linear-gradient(to bottom, #ffffff 0%, #ebebeb 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+
+  /* leggera ombra come nell'index */
+  text-shadow: 0 2px 6px rgba(0,0,0,.25);
+}
+
           .headline .caret{
             display:inline-block; width:1ch; border-right:2px solid #fff;
             transform: translateY(.12em);
