@@ -1,12 +1,16 @@
 // /system/blocks/experiences-gallery.js
-// Flow: Esperienza -> Barca -> Cibo (1 sola) -> Porto
+// Form a step: Esperienza -> Barca -> Cibo (1 sola) -> Porto
+// - Tabs stile "tag" (dark, attivo/completato bianco)
+// - Scroll orizzontale con snap + scaling graduale
+// - Animazioni di comparsa/scomparsa con leggero delay (stagger)
+// - Dots/pallini sotto le card
+// - Emissione finale "form-complete"
 (() => {
   if (customElements.get('experiences-gallery')) return;
 
   const ENTER_DUR = 280; // ms
   const EXIT_DUR  = 180; // ms
   const STAGGER   = 60;  // ms tra una card e la successiva
-  const TYPE_SPEED = 10; // ms per carattere nel titolo
 
   class ExperiencesGallery extends HTMLElement {
     constructor() {
@@ -35,19 +39,19 @@
           { id:'firew',   title:'Recco Fireworks',  price:'€1200 per group',img:'./assets/images/fireworks.jpg',   desc:'Notte di fuochi dal mare.' },
         ],
         barca: [
-          { id:'gozzo',  title:'Leggera',       price:'Incluso', img:'./assets/images/leggera.jpg',  desc:'Classico e confortevole.' },
-          { id:'rib',    title:'Gozzo Ligure',  price:'+ €90',   img:'./assets/images/barca2.jpg',    desc:'Agile e veloce.' },
-          { id:'yacht',  title:'Piccolo Yacht', price:'+ €350',  img:'./assets/images/barca3.jpg',  desc:'Eleganza e spazio.' },
+          { id:'gozzo',  title:'Leggera',        price:'Incluso',  img:'./assets/images/leggera.jpg',  desc:'Classico e confortevole.' },
+          { id:'rib',    title:'Gozzo Ligure',   price:'+ €90',    img:'./assets/images/barca2.jpg',   desc:'Agile e veloce.' },
+          { id:'yacht',  title:'Piccolo Yacht',  price:'+ €350',   img:'./assets/images/barca3.jpg',   desc:'Eleganza e spazio.' },
         ],
         cibo: [
-          { id:'focaccia', title:'Prosciutto e melone',         price:'+ €30', img:'./assets/images/melone.jpg',     desc:'Tipico ligure.' },
-          { id:'crudo',    title:'Insalata di anguria e cipolle',price:'+ €80', img:'./assets/images/anguria.jpg',    desc:'Selezione del giorno.' },
-          { id:'veget',    title:'Vegetariano',                 price:'+ €25', img:'./assets/images/couscous.jpg',   desc:'Fresco e leggero.' },
+          { id:'focaccia', title:'Prosciutto e melone',          price:'+ €30', img:'./assets/images/melone.jpg',   desc:'Tipico ligure.' },
+          { id:'crudo',    title:'Insalata di anguria e cipolle',price:'+ €80', img:'./assets/images/anguria.jpg',  desc:'Selezione del giorno.' },
+          { id:'veget',    title:'Vegetariano',                  price:'+ €25', img:'./assets/images/couscous.jpg', desc:'Fresco e leggero.' },
         ],
         porto: [
           { id:'camogli',   title:'Porto Antico', price:'—', img:'./assets/images/portoantico.jpg',  desc:'Partenza dal molo principale.' },
-          { id:'portofino', title:'Portofino',    price:'—', img:'./assets/images/porto1.jpg',       desc:'Comodo parcheggio.' },
-          { id:'recco',     title:'Recco',        price:'—', img:'./assets/images/portofino.jpg',    desc:'Iconico borgo.' },
+          { id:'portofino', title:'Portofino',    price:'—', img:'./assets/images/portofino.jpg',    desc:'Iconico borgo.' },
+          { id:'recco',     title:'Recco',        price:'—', img:'./assets/images/porto1.jpg',       desc:'Comodo parcheggio.' },
         ]
       };
 
@@ -62,7 +66,7 @@
 
             --gap: 32px;
 
-            /* padding separati (override da fuori se serve) */
+            /* padding separati */
             --pad-inline: 16px;
             --pad-top: 3rem;
             --pad-bottom: 8rem;
@@ -76,70 +80,57 @@
             display: block;
             width: 100%;
             box-sizing: border-box;
+
+            /* FONT: Plus Jakarta ovunque nel componente */
+            font-family: var(--font-sans, "Plus Jakarta Sans", system-ui, sans-serif);
+            -webkit-font-smoothing: antialiased;
+            text-rendering: optimizeLegibility;
           }
 
-          /* Headline step (Plus Jakarta Sans) */
-/* Titolo typewriter in stile Apple, uguale alle sezioni dell'index */
-.headline{
-  font-family: var(--font-sans, "Plus Jakarta Sans", system-ui, sans-serif);
-  font-weight: 700;
-  font-size: clamp(1.4rem, 2vw + 0.7rem, 2rem); /* stessa scala di .exp-title/.reviews-title */
-  line-height: 1.2;
-  text-align: center;
-  margin: 0 var(--pad-inline) 24px;
-
-  /* sfumatura + riempimento trasparente */
-  background: linear-gradient(to bottom, #ffffff 0%, #ebebeb 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  color: transparent;
-
-  /* leggera ombra come nell'index */
-  text-shadow: 0 2px 6px rgba(0,0,0,.25);
-}
-
-          .headline .caret{
-            display:inline-block; width:1ch; border-right:2px solid #fff;
-            transform: translateY(.12em);
-            animation: blink 1s steps(1) infinite;
-            margin-left: 2px;
+          /* Headline step */
+          .headline {
+            margin: 16px var(--pad-inline) 24px;
+            font-weight: 700;
+            font-size: 18px;
+            line-height: 1.3;
+            color: #fff;
+            text-align: center;
+            font-family: var(--font-sans, "Plus Jakarta Sans", system-ui, sans-serif);
           }
-          @keyframes blink { 50% { opacity: 0 } }
 
-          /* Tabs/breadcrumbs */
-          .tabs { position: static; background: transparent; border: none; padding: 0; margin: 8px var(--pad-inline) 6px; }
+          /* Tabs stile tag (dark, attivo/completato bianco) */
+          .tabs { position: static; background: transparent; border: none; padding: 0; margin: 0 var(--pad-inline) 8px; }
           .tabs .row {
-            display: flex; gap: 10px; align-items: center; justify-content: center; flex-wrap: wrap;
+            display: flex; gap: 8px; align-items: center; justify-content: center; flex-wrap: wrap;
           }
           .tab {
-            display: inline-flex; align-items: center; justify-content: center;
-            gap: 6px;
-            padding: 4px 10px;               /* desktop */
-            font: 600 13px/1.2 var(--font-sans, "Plus Jakarta Sans", system-ui, sans-serif);
-            color: rgba(255,255,255,.88);
-            background: rgba(255,255,255,.08);
-            border: 1px solid rgba(255,255,255,.18);
+            display: inline-flex; align-items: center; justify-content: center; gap: 4px;
+            padding: 3px 10px;                      /* breadcrumb-ish */
+            font-weight: 600; font-size: 13px; line-height: 1.1;
+            color: #e8eef8;
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.18);
             border-radius: 999px;
             cursor: pointer; user-select: none;
-            transition: background .16s ease, color .16s ease, border-color .16s ease, filter .16s ease, opacity .16s ease;
-            filter: grayscale(25%) blur(.2px);
-            opacity: .9;
+            transition: background .15s ease, border-color .15s ease, color .15s ease, opacity .15s ease;
+            font-family: var(--font-sans, "Plus Jakarta Sans", system-ui, sans-serif);
           }
-          /* stato attivo o già completato: pill bianca, testo scuro */
-          .tab[data-active="true"],
-          .tab[data-done="true"]{
-            background: #fff;
-            color: #0B1220;
-            border-color: rgba(255,255,255,.8);
-            filter: none;
-            opacity: 1;
-          }
-          .tab[aria-disabled="true"] { opacity: .55; cursor: default; }
+          .tab:hover:not([aria-disabled="true"]) { background: rgba(255,255,255,.10); }
+          .tab[aria-disabled="true"] { opacity: .5; cursor: default; }
 
-          @media (max-width: 560px){
-            .tabs .row { gap: 8px; }
-            .tab { padding: 2px 8px; font-size: 12px; gap: 4px; }
+          /* ATTIVO = bianco */
+          .tab[aria-selected="true"],
+          .tab[data-active="true"] {
+            background: #fff;
+            color: #0b1220;
+            border-color: transparent;
+          }
+          /* COMPLETATO = resta bianco */
+          .tab[data-done="true"] {
+            background: #fff;
+            color: #0b1220;
+            border-color: transparent;
+            opacity: 1;
           }
 
           /* Wrapper scroller */
@@ -179,33 +170,38 @@
             mix-blend-mode: screen;
           }
 
-          /* spacer ai lati (dinamici in JS) */
+          /* Spacers ai lati (dinamici) */
           .spacer { display: block; flex: 0 0 12px; scroll-snap-align: none; pointer-events: none; }
 
+          /* Dots pagination (minimal) */
+          .dots{
+            position: absolute; left: 0; right: 0; bottom: 76px;
+            display: flex; justify-content: center; gap: 8px;
+            pointer-events: none;
+          }
+          .dot{
+            inline-size: 6px; block-size: 6px; border-radius: 999px;
+            background: rgba(255,255,255,.28);
+            transform: scale(1);
+            transition: transform .18s ease, background-color .18s ease, opacity .18s;
+            opacity: .85;
+          }
+          .dot[aria-current="true"]{
+            background: #fff; opacity: 1; transform: scale(1.25);
+          }
+          @media (min-width: 501px){
+            .scroller { padding-top: var(--pad-top-desktop); }
+            .dots{ bottom: 32px; }
+          }
+
           /* Animazioni (entrata/uscita) */
-          @keyframes card-in {
-            from { opacity: 0; transform: translateY(8px) scale(.985); }
-            to   { opacity: 1; transform: translateY(0)    scale(1); }
-          }
-          @keyframes card-out {
-            to   { opacity: 0; transform: translateY(8px) scale(.985); }
-          }
-          .card-enter {
-            animation: card-in var(--enter-dur) cubic-bezier(.2,.7,.2,1) both;
-            animation-delay: calc(var(--stagger-idx, 0) * var(--stagger));
-          }
-          .card-leave {
-            animation: card-out var(--exit-dur) ease both;
-            animation-delay: calc(var(--stagger-idx, 0) * var(--stagger));
-          }
+          @keyframes card-in { from { opacity:0; transform: translateY(8px) scale(.985); } to { opacity:1; transform: translateY(0) scale(1);} }
+          @keyframes card-out { to { opacity:0; transform: translateY(8px) scale(.985);} }
+          .card-enter{ animation: card-in var(--enter-dur) cubic-bezier(.2,.7,.2,1) both; animation-delay: calc(var(--stagger-idx, 0) * var(--stagger)); }
+          .card-leave{ animation: card-out var(--exit-dur) ease both; animation-delay: calc(var(--stagger-idx, 0) * var(--stagger)); }
 
           @media (prefers-reduced-motion: reduce) {
             .card-enter, .card-leave { animation: none !important; }
-            .headline .caret { display:none; }
-          }
-
-          @media (min-width: 501px) {
-            .scroller { padding-top: var(--pad-top-desktop); }
           }
         </style>
 
@@ -221,6 +217,7 @@
             <!-- cards create dinamicamente -->
             <div class="spacer" aria-hidden="true"></div>
           </div>
+          <div class="dots" id="dots" aria-hidden="true"></div>
         </div>
       `;
     }
@@ -243,10 +240,9 @@
       scroller?.removeEventListener('scroll', this._onScroll);
       this._ro?.disconnect();
       if (this._raf) cancelAnimationFrame(this._raf);
-      if (this._typeTimer) clearTimeout(this._typeTimer);
     }
 
-    /* ---------- UI Rendering ---------- */
+    // ---------- UI Rendering ----------
     _renderTabs() {
       const row = this.shadowRoot.getElementById('tabsRow');
       row.innerHTML = '';
@@ -277,9 +273,12 @@
     }
 
     async _renderStep() {
+      const head = this.shadowRoot.getElementById('headline');
       const step = this._steps[this._currentStep];
       const scroller = this.shadowRoot.getElementById('scroller');
       const token = ++this._renderToken;
+
+      head.textContent = this._headlineFor(step.key);
 
       // 1) Anima via le card correnti (non spacer)
       const leaving = Array.from(scroller.children).filter(n => !n.classList.contains('spacer'));
@@ -295,10 +294,7 @@
         leaving.forEach(n => n.remove());
       }
 
-      // 2) Titolo: typewriter sincronizzato con l'ingresso delle nuove card
-      this._typeHeadline(this._headlineFor(step.key), token);
-
-      // 3) Inserisci le nuove card e anima ingresso con stagger (parte insieme al typewriter)
+      // 2) Inserisci le nuove card e anima ingresso
       const items = this._data[step.key] || [];
       const anchor = scroller.lastElementChild; // spacer finale
       const frag = document.createDocumentFragment();
@@ -309,6 +305,9 @@
         frag.appendChild(card);
       });
       scroller.insertBefore(frag, anchor);
+
+      // Dots per il nuovo step
+      this._renderDots(items.length);
 
       // Reset scroll step
       scroller.scrollTo({ left: 0 });
@@ -323,7 +322,7 @@
 
       this._renderTabs();
 
-      // 4) Aggiorna FX e rimuovi classi 'card-enter' dopo anim
+      // 3) Aggiorna FX e ripulisci classi 'card-enter' a fine anim
       this._queueUpdate();
       setTimeout(() => {
         if (token !== this._renderToken) return;
@@ -371,29 +370,7 @@
       }
     }
 
-    /* ---------- Typewriter titolo ---------- */
-    _typeHeadline(text, tokenAtRender) {
-      if (this._typeTimer) { clearTimeout(this._typeTimer); this._typeTimer = null; }
-      const head = this.shadowRoot.getElementById('headline');
-      head.innerHTML = `<span class="txt"></span><i class="caret" aria-hidden="true"></i>`;
-      const holder = head.querySelector('.txt');
-
-      let i = 0;
-      const tick = () => {
-        if (tokenAtRender !== this._renderToken) return; // evita race passando rapidamente tra step
-        if (i <= text.length) {
-          holder.textContent = text.slice(0, i++);
-          this._typeTimer = setTimeout(tick, TYPE_SPEED);
-        } else {
-          const caret = head.querySelector('.caret');
-          caret && caret.remove(); // fine digitazione
-          this._typeTimer = null;
-        }
-      };
-      tick();
-    }
-
-    /* ---------- Selezione & Navigazione ---------- */
+    // ---------- Selezione & Navigazione ----------
     _handleSelect(stepKey, value) {
       if (stepKey === 'cibo') this._selections.cibo = value; // single-select
       else this._selections[stepKey] = value;
@@ -415,7 +392,7 @@
       return !!this._selections[key];
     }
 
-    /* ---------- Scroll FX ---------- */
+    // ---------- Scroll FX ----------
     _onScroll() { this._queueUpdate(); }
     _queueUpdate() {
       if (this._raf) return;
@@ -489,9 +466,37 @@
           if (el === best) el.setAttribute('data-active', '');
           else el.removeAttribute('data-active');
         }
+        const activeIndex = children.indexOf(best);
+        this._updateDots(activeIndex);
       }
     }
 
+    // ---------- Dots ----------
+    _renderDots(count){
+      const dots = this.shadowRoot.getElementById('dots');
+      if (!dots) return;
+      dots.innerHTML = '';
+      for (let i = 0; i < count; i++){
+        const d = document.createElement('i');
+        d.className = 'dot';
+        d.setAttribute('role','presentation');
+        dots.appendChild(d);
+      }
+      // set iniziale
+      this._updateDots(0);
+    }
+
+    _updateDots(activeIndex){
+      const dots = this.shadowRoot.getElementById('dots');
+      if (!dots) return;
+      const list = Array.from(dots.children);
+      list.forEach((el, i) => {
+        if (i === activeIndex) el.setAttribute('aria-current','true');
+        else el.removeAttribute('aria-current');
+      });
+    }
+
+    // ---------- Utils ----------
     _toPx(val) {
       const num = parseFloat(val);
       if (String(val).includes('rem')) {
@@ -500,7 +505,6 @@
       if (String(val).includes('px') || !isNaN(num)) return num || 0;
       return 0;
     }
-
     _wait(ms) { return new Promise(r => setTimeout(r, ms)); }
   }
 
