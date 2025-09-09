@@ -88,26 +88,82 @@
             color: #fff;
           }
 
-          /* ── BREADCRUMBS stile "tag" (nessun padding/margin al container) ── */
-          .tabs { position: static; background: transparent; border: none; padding: 0; margin: 0 var(--pad-inline) 8px; }
-          .tabs .row {
-            display: flex; gap: 8px; align-items: center; justify-content: center; flex-wrap: wrap;
+/* TABS: pill bianche, nessuna ombra, centrate */
+.tabs{
+  position: static;
+  background: transparent;
+  border: none;
+  /* centratura rispetto alla pagina/contenitore */
+  margin: 0 auto 12px;
+  width: 100%;
+  max-width: 1100px;               /* allinea alla tua grid */
+  padding: 0 var(--pad-inline);
+  box-sizing: border-box;
+}
+.tabs .row{
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  justify-content: center;         /* centrato */
+}
+
+/* pill bianche in ogni stato; niente shadow */
+.tab{
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 14px;
+  font: 600 13px/1.1 var(--font-sans, system-ui, sans-serif);
+  color: #0b1220;                  /* testo scuro sul bianco */
+  background: #ffffff;             /* BIANCO */
+  border: 1px solid #ffffff;
+  border-radius: 999px;
+  cursor: pointer;
+  user-select: none;
+  transition: opacity .15s ease, transform .12s ease, border-color .15s ease;
+}
+.tab:hover:not([aria-disabled="true"]){ opacity: .9; }
+
+/* attiva: sempre bianca */
+.tab[data-active="true"]{
+  background: #ffffff;
+  color: #0b1220;
+  border-color: #ffffff;
+}
+
+/* completata: sempre bianca ma un filo attenuata */
+.tab[data-done="true"]{
+  background: #ffffff;
+  color: #0b1220;
+  border-color: #e5e7eb;
+  opacity: .8;
+}
+.tab[data-done="true"]::after{
+  content: "✓";
+  font-weight: 700;
+  font-size: 12px;
+  margin-left: 6px;
+}
+
+/* futura/disabilitata: bianca ma più chiara */
+.tab[aria-disabled="true"]{
+  opacity: .45;
+  cursor: default;
+}
+
+/* focus accessibile (niente shadow) */
+.tab:focus-visible{
+  outline: 2px solid var(--ring-brand, #93C5FD);
+  outline-offset: 2px;
+}
+
+
+          @media (max-width: 560px){
+            .tabs .row{ gap: 6px; }
+            .tab{ padding: 5px 10px; font-weight: 700; font-size: 12.5px; }
           }
-          .tab {
-            display: inline-flex; align-items: center; justify-content: center; gap: 4px;
-            padding: 4px 10px;
-            font: 600 13px/1.2 "Plus Jakarta Sans", system-ui, sans-serif;
-            color: #fff;
-            background: rgba(37, 99, 235, 0.25);
-            border: 1px solid rgba(255, 255, 255, 0.25);
-            border-radius: 999px;
-            cursor: pointer; user-select: none;
-            transition: background .15s ease, border-color .15s ease, opacity .15s ease;
-          }
-          .tab:hover:not([aria-disabled="true"]) { background: rgba(37,99,235,.35); border-color: rgba(255,255,255,.35); }
-          .tab[data-active="true"] { background: rgba(37,99,235,.45); border-color: rgba(255,255,255,.45); }
-          .tab[data-done="true"]::after { content: "✓"; font-weight: 700; margin-left: 4px; font-size: 12px; color: currentColor; }
-          .tab[aria-disabled="true"] { opacity: .5; cursor: default; }
 
           /* Wrapper scroller */
           .wrap { position: relative; }
