@@ -1,8 +1,8 @@
 // /system/blocks/experiences-gallery.js
 // Form a step: Esperienza -> Barca -> Cibo (1 sola) -> Porto
 // - Tabs stile "tag" (dark, attivo/done bianco)
-// - Scroll orizzontale con snap + scaling graduale
-// - Animazioni di comparsa/scomparsa con leggero delay (stagger)
+// - Scroll orizzontale con snap + scaling graduale (senza shine extra)
+// - Animazioni di comparsa/scomparsa con leggero delay (stagger) senza interferire con la scala
 // - Dots/pallini sotto le card
 // - Typewriter sul titolo (senza caret), centrato e stabile
 // - Emissione finale "form-complete"
@@ -22,8 +22,8 @@
       this._raf = null;
       this._renderToken = 0;
 
-      // Typewriter
-      this._typeSpeed = 10; // ms per carattere (modifica qui per cambiare velocità)
+      // Typewriter (velocità consigliata 24–36 ms)
+      this._typeSpeed = 28; // ms per carattere — modifica qui per cambiare velocità
       this._twTimer = null;
 
       // Stato del form
@@ -36,7 +36,7 @@
       this._currentStep = 0;
       this._selections = { esperienza: null, barca: null, cibo: null, porto: null };
 
-      // Dati demo
+      // Dati demo (usa i tuoi asset)
       this._data = {
         esperienza: [
           { id:'rainbow', title:'The Rainbow Tour', price:'€570 per group', img:'./assets/images/portofino.jpg',   desc:'Esplora baie segrete da Punta Chiappa a Portofino.' },
@@ -75,7 +75,7 @@
             /* padding separati */
             --pad-inline: 16px;
             --pad-top: 3rem;
-            --pad-bottom: 8rem;
+            --pad-bottom: 7.5rem;
             --pad-top-desktop: 4rem;
 
             /* animazioni */
@@ -89,16 +89,15 @@
             font-family: var(--font-sans, "Plus Jakarta Sans", system-ui, sans-serif);
           }
 
-          /* Headline (gradient Apple-like, centrato, stabile) */
+          /* Headline Apple-like (centrato e stabile) */
           .headline{
-            margin: 16px var(--pad-inline) 12px;
+            margin: 8px var(--pad-inline) 10px;
             font-family: var(--font-sans, "Plus Jakarta Sans", system-ui, sans-serif);
             font-weight: 700;
             font-size: 1.4rem;
             line-height: 1.2;
             text-align: center;
 
-            /* stile Apple index */
             background: linear-gradient(to bottom, #ffffff 0%, #ebebeb 100%);
             -webkit-background-clip: text;
             background-clip: text;
@@ -106,21 +105,21 @@
             color: transparent;
             text-shadow: 0 2px 6px rgba(0,0,0,0.25);
 
-            min-height: 1.4em; /* evita salti */
+            min-height: 1.6em; /* evita salti */
           }
           .headline #tw{
             display: inline-block;
-            white-space: nowrap; /* nessun wrap -> niente shift */
+            white-space: nowrap; /* niente wrap -> nessuno shift a sx */
           }
 
           /* Tabs stile tag (dark, attivo/done bianco) */
-          .tabs { position: static; background: transparent; border: none; padding: 0; margin: 0 var(--pad-inline) 8px; }
+          .tabs { position: static; background: transparent; border: none; padding: 0; margin: 0 var(--pad-inline) 6px; }
           .tabs .row {
             display: flex; gap: 8px; align-items: center; justify-content: center; flex-wrap: wrap;
           }
           .tab {
             display: inline-flex; align-items: center; justify-content: center; gap: 4px;
-            padding: 3px 10px; /* breadcrumb-like */
+            padding: 3px 10px;                      /* breadcrumb-like */
             font-family: var(--font-sans, "Plus Jakarta Sans", system-ui, sans-serif);
             font-weight: 600; font-size: 13px; line-height: 1.1;
             color: #e8eef8;
@@ -133,19 +132,13 @@
           .tab:hover:not([aria-disabled="true"]) { background: rgba(255,255,255,.10); }
           .tab[aria-disabled="true"] { opacity: .5; cursor: default; }
 
-          /* attivo */
+          /* attivo + completati: restano bianchi */
           .tab[aria-selected="true"],
-          .tab[data-active="true"] {
+          .tab[data-active="true"],
+          .tab[data-done="true"] {
             background: #fff;
             color: #0b1220;
             border-color: transparent;
-          }
-          /* completati: restano bianchi */
-          .tab[data-done="true"]{
-            background: #fff;
-            color: #0b1220;
-            border-color: transparent;
-            opacity: .95;
           }
 
           /* Wrapper scroller */
@@ -162,35 +155,25 @@
             scroll-snap-type: x mandatory;
           }
           .scroller::-webkit-scrollbar { display: none; }
-          .scroller > * { flex: 0 0 auto; scroll-snap-align: center; scroll-snap-stop: normal; }
+          .scroller > * { flex: 0 0 auto; scroll-snap-align: center; scroll-snap-stop: always; }
 
-          /* Card: scaling/shine */
+          /* Card: scaling (NO SHINE) */
           .scroller > :not(.spacer) {
             position: relative;
             transform: scale(var(--_scale, 1));
             opacity: var(--_opacity, 1);
-            transition: transform 0s, opacity 0s;
+            transition: transform 0s, opacity 0s; /* immediata: niente conflitti con anim */
             will-change: transform, opacity;
             z-index: var(--_z, 0);
           }
-          .scroller > :not(.spacer)::after {
-            content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none;
-            background-image: linear-gradient(60deg,
-              rgba(255,255,255,0) 0%,
-              rgba(255,255,255,0.06) 40%,
-              rgba(255,255,255,0.14) 50%,
-              rgba(255,255,255,0.06) 60%,
-              rgba(255,255,255,0) 100%);
-            opacity: calc(var(--_shine, 0) * 0.45);
-            mix-blend-mode: screen;
-          }
+          /* (RIMOSSO qualsiasi ::after "shine") */
 
           /* Spacers ai lati (dinamici) */
           .spacer { display: block; flex: 0 0 12px; scroll-snap-align: none; pointer-events: none; }
 
           /* Dots pagination (minimal) */
           .dots{
-            position: absolute; left: 0; right: 0; bottom: 76px;
+            position: absolute; left: 0; right: 0; bottom: 48px;
             display: flex; justify-content: center; gap: 8px;
             pointer-events: none;
           }
@@ -204,17 +187,28 @@
           .dot[aria-current="true"]{
             background: #fff; opacity: 1; transform: scale(1.25);
           }
-
           @media (min-width: 501px){
             .scroller { padding-top: var(--pad-top-desktop); }
-            .dots{ bottom: 32px; } /* più vicino alle card su desktop */
+            .dots{ bottom: 28px; }
           }
 
-          /* Animazioni (entrata/uscita) */
-          @keyframes card-in { from { opacity:0; transform: translateY(8px) scale(.985); } to { opacity:1; transform: translateY(0) scale(1);} }
-          @keyframes card-out { to { opacity:0; transform: translateY(8px) scale(.985);} }
-          .card-enter{ animation: card-in var(--enter-dur) cubic-bezier(.2,.7,.2,1) both; animation-delay: calc(var(--stagger-idx, 0) * var(--stagger)); }
-          .card-leave{ animation: card-out var(--exit-dur) ease both; animation-delay: calc(var(--stagger-idx, 0) * var(--stagger)); }
+          /* Animazioni (entrata/uscita) — NON tocchiamo la scala, solo translate/opacity */
+          @supports (translate: 0) {
+            @keyframes card-in { from { opacity:0; translate: 0 8px; } to { opacity:1; translate: 0 0; } }
+            @keyframes card-out{ to   { opacity:0; translate: 0 8px; } }
+          }
+          @supports not (translate: 0) {
+            @keyframes card-in { from { opacity:0; transform: translateY(8px) scale(var(--_scale,1)); } to { opacity:1; transform: translateY(0) scale(var(--_scale,1)); } }
+            @keyframes card-out{ to   { opacity:0; transform: translateY(8px) scale(var(--_scale,1)); } }
+          }
+          .card-enter{
+            animation: card-in var(--enter-dur) cubic-bezier(.2,.7,.2,1) both;
+            animation-delay: calc(var(--stagger-idx, 0) * var(--stagger));
+          }
+          .card-leave{
+            animation: card-out var(--exit-dur) ease both;
+            animation-delay: calc(var(--stagger-idx, 0) * var(--stagger));
+          }
 
           @media (prefers-reduced-motion: reduce) {
             .card-enter, .card-leave { animation: none !important; }
@@ -247,10 +241,17 @@
       const scroller = this.shadowRoot.getElementById('scroller');
       scroller.addEventListener('scroll', this._onScroll, { passive: true });
 
-      this._ro = new ResizeObserver(() => this._queueUpdate());
+      this._ro = new ResizeObserver(() => {
+        // Centra e aggiorna durante resize senza scatti
+        this._updateSpacers();
+        this._updateVisuals();
+      });
       this._ro.observe(scroller);
 
-      requestAnimationFrame(() => this._queueUpdate());
+      requestAnimationFrame(() => {
+        this._updateSpacers();
+        this._updateVisuals();
+      });
     }
 
     disconnectedCallback() {
@@ -273,10 +274,12 @@
         b.dataset.index = i;
         b.setAttribute('role', 'tab');
 
-        const done = i < this._currentStep || (i === this._currentStep && this._isStepDone(i));
-        b.dataset.done = done ? 'true' : 'false';
-        b.dataset.active = (i === this._currentStep) ? 'true' : 'false';
-        b.setAttribute('aria-selected', i === this._currentStep ? 'true' : 'false');
+        const done = !!this._selections[s.key];
+        const isActive = (i === this._currentStep);
+
+        b.dataset.active = isActive ? 'true' : 'false';
+        b.dataset.done   = done ? 'true' : 'false';
+        b.setAttribute('aria-selected', isActive ? 'true' : 'false');
         if (i > this._currentStep && !done) b.setAttribute('aria-disabled', 'true');
 
         b.addEventListener('click', () => {
@@ -296,7 +299,7 @@
       const scroller = this.shadowRoot.getElementById('scroller');
       const token = ++this._renderToken;
 
-      // 1) Anima via le card correnti (non spacer)
+      // 1) Uscita card correnti (non spacer)
       const leaving = Array.from(scroller.children).filter(n => !n.classList.contains('spacer'));
       if (leaving.length) {
         leaving.forEach((el, i) => {
@@ -310,7 +313,7 @@
         leaving.forEach(n => n.remove());
       }
 
-      // 2) Inserisci le nuove card e anima ingresso
+      // 2) Inserisci nuove card
       const items = this._data[step.key] || [];
       const anchor = scroller.lastElementChild; // spacer finale
       const frag = document.createDocumentFragment();
@@ -322,36 +325,32 @@
       });
       scroller.insertBefore(frag, anchor);
 
-      // Dots per il nuovo step
+      // 3) Dots
       this._renderDots(items.length);
 
-      // Reset scroll step + update spacers per centrare PERFETTAMENTE
-      // (senza sottrarre gap: lo spacer deve essere (host - card)/2)
-      requestAnimationFrame(() => {
-        this._updateSpacers();
-        scroller.scrollTo({ left: 0 });
-        this._queueUpdate();
-      });
+      // 4) Centra SUBITO la prima card e applica la scala PRIMA del typewriter
+      //    (niente scatti: niente scrollTo smooth, e aggiorniamo le spacers sync)
+      this._updateSpacers();
+      scroller.scrollLeft = 0;
+      this._updateVisuals(); // scala immediata della card centrale
 
-      // CTA
+      // 5) Tabs + Titolo (typewriter)
+      this._renderTabs();
+      this._typeHeadline(this._headlineFor(step.key));
+
+      // 6) Pulizia animazioni
+      setTimeout(() => {
+        if (token !== this._renderToken) return;
+        scroller.querySelectorAll('.card-enter').forEach(el => el.classList.remove('card-enter'));
+      }, ENTER_DUR + (items.length - 1) * STAGGER + 20);
+
+      // 7) Bind CTA (avanza step)
       scroller.querySelectorAll('ds-button[slot="cta"]').forEach(btn => {
         btn.addEventListener('ds-select', () => {
           const val = btn.getAttribute('value');
           this._handleSelect(step.key, val);
         });
       });
-
-      // Tabs
-      this._renderTabs();
-
-      // Titolo typewriter (dopo che le card sono inserite)
-      this._typeHeadline(this._headlineFor(step.key));
-
-      // Ripulisci classi 'card-enter' a fine anim
-      setTimeout(() => {
-        if (token !== this._renderToken) return;
-        scroller.querySelectorAll('.card-enter').forEach(el => el.classList.remove('card-enter'));
-      }, ENTER_DUR + (items.length - 1) * STAGGER + 20);
     }
 
     _createCard(stepKey, item) {
@@ -362,11 +361,12 @@
       if (item.price) el.setAttribute('price', item.price);
       if (item.desc)  el.setAttribute('description', item.desc);
 
+      // Il bottone resta come nel tuo design system (bianco solid full)
       const cta = document.createElement('ds-button');
       cta.setAttribute('slot', 'cta');
       cta.setAttribute('size', 'md');
       cta.setAttribute('full', '');
-      cta.setAttribute('variant', stepKey === 'esperienza' ? 'with-icon-light' : 'solid-light');
+      cta.setAttribute('variant', 'solid-light');
       cta.setAttribute('value', item.id);
       cta.innerHTML = `<span slot="text">${this._ctaTextFor(stepKey)}</span>`;
 
@@ -400,7 +400,7 @@
       if (!tw) return;
       if (this._twTimer) { clearTimeout(this._twTimer); this._twTimer = null; }
       tw.textContent = '';
-      // start dopo un frame per non competere con il repaint delle card
+      // start dopo un frame (le card sono già centrate e scalate)
       requestAnimationFrame(() => this._typewriteStep(tw, text, 0));
     }
     _typewriteStep(tw, text, i){
@@ -436,16 +436,13 @@
     }
 
     // ---------- Scroll FX ----------
-    _onScroll() { this._queueUpdate(); }
-    _queueUpdate() {
+    _onScroll() {
       if (this._raf) return;
       this._raf = requestAnimationFrame(() => {
         this._raf = null;
-        this._updateSpacers();
         this._updateVisuals();
       });
     }
-
     _updateSpacers() {
       const scroller = this.shadowRoot.getElementById('scroller');
       const items = Array.from(scroller.children).filter(el => el.tagName && el.tagName.includes('-'));
@@ -458,7 +455,7 @@
       const lastRect  = items[items.length - 1].getBoundingClientRect();
       if (firstRect.width === 0 || lastRect.width === 0) return;
 
-      // Fix centratura: nessuna sottrazione del gap!
+      // Centratura precisa: (host - card)/2 — niente sottrazione del gap!
       const leftNeeded  = Math.max(12, (hostRect.width - firstRect.width) / 2);
       const rightNeeded = Math.max(12, (hostRect.width - lastRect.width)  / 2);
 
@@ -466,13 +463,12 @@
       if (spacers[0]) spacers[0].style.flexBasis = `${Math.round(leftNeeded)}px`;
       if (spacers[1]) spacers[1].style.flexBasis = `${Math.round(rightNeeded)}px`;
     }
-
     _updateVisuals() {
       const scroller = this.shadowRoot.getElementById('scroller');
       const hostRect = scroller.getBoundingClientRect();
       const hostCenterX = hostRect.left + hostRect.width / 2;
 
-      const cs = getComputedStyle(scroller);
+      const cs = getComputedStyle(this);
       const falloff = parseFloat(cs.getPropertyValue('--falloff')) || 260;
       const sMin = parseFloat(cs.getPropertyValue('--scale-min')) || 0.92;
       const sMax = parseFloat(cs.getPropertyValue('--scale-max')) || 1.06;
@@ -489,7 +485,6 @@
 
         const t = 1 - Math.min(dist / falloff, 1); // 0..1
         const eased = 1 - (1 - t) * (1 - t);       // easeOutQuad
-        const shineT = Math.max(0, Math.min(1, t * 1.25 + 0.15));
 
         const scale = sMin + (sMax - sMin) * eased;
         const opacity = oMin + (1 - oMin) * eased;
@@ -497,7 +492,6 @@
         el.style.setProperty('--_scale', scale.toFixed(4));
         el.style.setProperty('--_opacity', opacity.toFixed(4));
         el.style.setProperty('--_z', (Math.round(eased * 100)).toString());
-        el.style.setProperty('--_shine', shineT.toFixed(4));
 
         if (dist < bestDist) { bestDist = dist; best = el; }
       }
@@ -525,7 +519,6 @@
       }
       this._updateDots(0);
     }
-
     _updateDots(activeIndex){
       const dots = this.shadowRoot.getElementById('dots');
       if (!dots) return;
@@ -537,14 +530,6 @@
     }
 
     // ---------- Utils ----------
-    _toPx(val) {
-      const num = parseFloat(val);
-      if (String(val).includes('rem')) {
-        return num * parseFloat(getComputedStyle(document.documentElement).fontSize || 16);
-      }
-      if (String(val).includes('px') || !isNaN(num)) return num || 0;
-      return 0;
-    }
     _wait(ms) { return new Promise(r => setTimeout(r, ms)); }
   }
 
