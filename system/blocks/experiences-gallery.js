@@ -39,7 +39,8 @@
       // Dati demo (usa i tuoi asset)
       this._data = {
         esperienza: [
-          { id:'rainbow', title:'The Rainbow Tour', price:'€570 per group', img:'./assets/images/portofino.jpg',   desc:'Esplora baie segrete da Punta Chiappa a Portofino.' },
+          { id:'rainbow', title:'Full Day', price:'€650 per group', img:'./assets/images/portofino.jpg',   desc:'Una giornata intera di esplorazione nel golfo di Portofino' },
+          { id:'rainbow', title:'Half Day', price:'€450 per group', img:'./assets/images/portofino.jpg',   desc:'Goditi mezza giornata di bagno a Bogliasco' },
           { id:'gourmet', title:'Gourmet Sunset',   price:'€390 per group', img:'./assets/images/genovese.jpg',    desc:'Tramonto con degustazione a bordo.' },
           { id:'stella',  title:'Stella Maris',     price:'€1200 per group',img:'./assets/images/special.jpg',     desc:'Camogli e San Fruttuoso con aperitivo.' },
           { id:'firew',   title:'Recco Fireworks',  price:'€1200 per group',img:'./assets/images/fireworks.jpg',   desc:'Notte di fuochi dal mare.' },
