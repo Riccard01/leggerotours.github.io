@@ -69,7 +69,9 @@
             aspect-ratio:9/16;
             width: 240px;
           }
-
+* {
+  font-family: 'Plus Jakarta Sans' !important;
+}
           @media (hover: hover) and (pointer: fine){
             :host(:hover){ transform: scale(1.07); }
           }

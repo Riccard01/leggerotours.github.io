@@ -85,7 +85,9 @@
             transform:scale(var(--s,1)); transition:transform .24s cubic-bezier(.2,.8,.2,1); background:#0b1220; color:#fff; font-family:system-ui,sans-serif;
             box-shadow:0 10px 30px rgba(0,0,0,.35);
           }
-
+* {
+  font-family: 'Plus Jakarta Sans' !important;
+}
           /* Glow robusto e sempre visibile (anche dentro la card) */
           :host::before{
             content:""; position:absolute; inset:0; border-radius:inherit; pointer-events:none;

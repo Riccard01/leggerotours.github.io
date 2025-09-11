@@ -89,7 +89,9 @@
             box-sizing: border-box;
             font-family: var(--font-sans, "Plus Jakarta Sans", system-ui, sans-serif);
           }
-
+* {
+  font-family: 'Plus Jakarta Sans' !important;
+}
           /* Headline Apple-like (centrato e stabile) */
           .headline{
             margin: 8px var(--pad-inline) 10px;

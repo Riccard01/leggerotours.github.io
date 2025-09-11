@@ -29,6 +29,7 @@ section {
   -moz-user-select: none;
   -ms-user-select: none;
   user-select: none;
+  font-family: 'Plus Jakarta Sans' !important;
 }
 
 /* Titoli */
