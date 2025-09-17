@@ -128,6 +128,14 @@
             avatar="./assets/images/avatar3.jpg">
           </review-card>
 
+          <review-card
+            image="./assets/images/me.jpg"
+            title="Melyssa"
+            description="Un tour indimenticabile, dal primo all’ultimo minuto. Consigliatissimo a chi vuole scoprire la Liguria dal mare."
+            tag="Da rifare"
+            avatar="./assets/images/avatar3.jpg">
+          </review-card>
+
           <div class="spacer" aria-hidden="true"></div>
         </div>
       `;
