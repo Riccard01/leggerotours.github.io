@@ -193,7 +193,7 @@
           }
           @media (min-width: 501px){
             .scroller { padding-top: var(--pad-top-desktop); }
-            .dots{ bottom: 28px; }
+            .dots{ bottom: 80px; }
           }
 
           /* Animazioni (entrata/uscita) — NON tocchiamo la scala, solo translate/opacity */
