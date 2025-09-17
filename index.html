@@ -38,11 +38,11 @@
 <experiences-gallery></experiences-gallery>
 
 <!-- Perks List -->
+ <my-title></my-title>
 <my-list>
   <img slot="image" src="./assets/images/fuel.png" alt="Bussola">
   <h3 slot="title" class="title">Fuel Included</h3>
   <p slot="description" class="desc">No extra surprises</p>
-  <span slot="tag" class="tag">2 ore</span>
   <!-- azioni opzionali -->
   <!-- <ds-button slot="action" variant="overlay" size="sm"><span slot="text">Dettagli</span></ds-button> -->
 </my-list>
@@ -50,15 +50,13 @@
   <img slot="image" src="./assets/images/mask.png" alt="Bussola">
   <h3 slot="title" class="title">Snorkeling gear</h3>
   <p slot="description" class="desc">No extra surprises</p>
-  <span slot="tag" class="tag">2 ore</span>
   <!-- azioni opzionali -->
   <!-- <ds-button slot="action" variant="overlay" size="sm"><span slot="text">Dettagli</span></ds-button> -->
 </my-list>
 <my-list>
-  <img slot="image" src="./assets/images/fuel.png" alt="Bussola">
-  <h3 slot="title" class="title">Fuel Included</h3>
-  <p slot="description" class="desc">No extra surprises</p>
-  <span slot="tag" class="tag">2 ore</span>
+  <img slot="image" src="./assets/images/towel.png" alt="Bussola">
+  <h3 slot="title" class="title">Towels</h3>
+  <p slot="description" class="desc">Get comfy</p>
   <!-- azioni opzionali -->
   <!-- <ds-button slot="action" variant="overlay" size="sm"><span slot="text">Dettagli</span></ds-button> -->
 </my-list>
@@ -86,7 +84,30 @@
 
 
 <reviews-gallery></reviews-gallery>
-<booking-calendar></booking-calendar>
+<booking-calendar
+  locale="it-IT"
+  start-on="1"
+  experience="half"
+  half-slot="pm"
+  availability='{
+    "2025-10-07":["full","half-am","half-pm","sunset"],
+    "2025-10-09":["half-am","sunset"],
+    "2025-10-10":["full"],
+    "2025-10-12":["half-pm"]
+  }'
+></booking-calendar>
+
+<script>
+  const cal = document.querySelector('booking-calendar');
+
+  // Puoi aggiornare via JS:
+  // cal.setAvailability({"2025-10-15":["sunset"],"2025-10-18":["full","half-pm"]}, false);
+
+  cal.addEventListener('filter-change', e => console.log('Filtro aggiornato:', e.detail));
+  cal.addEventListener('change', e => console.log('Data cambiata:', e.detail));
+  cal.addEventListener('confirm', e => console.log('Conferma:', e.detail));
+</script>
+
 <booking-ticket></booking-ticket>
 
   <!-- ===================== PROGRESS FORM (unico) ===================== -->

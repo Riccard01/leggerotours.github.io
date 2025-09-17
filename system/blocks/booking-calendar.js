@@ -1,10 +1,16 @@
-// /system/blocks/booking-calendar.js — Calendario minimal “Airbnb-like” su sfondo trasparente
+// /system/blocks/booking-calendar.js — Calendario minimal “Airbnb-like” con filtri esperienza
 (() => {
   if (customElements.get('booking-calendar')) return;
 
   class BookingCalendar extends HTMLElement {
     static get observedAttributes() {
-      return ['value','min','max','disabled-dates','locale','start-on']; // start-on: 1=Lunedì, 0=Domenica
+      return [
+        'value','min','max','disabled-dates','locale','start-on',
+        'availability',          // JSON: { "yyyy-mm-dd": ["full","half-am","half-pm","sunset"], ... }
+        'experience',            // "full" | "half" | "sunset"
+        'half-slot',             // "am" | "pm" (valido solo se experience="half")
+        'assume-available'       // "true" se vuoi abilitare tutto salvo override
+      ];
     }
 
     constructor(){
@@ -17,13 +23,21 @@
         locale: 'it-IT',
         startOn: 1, // lunedì
         monthCursor: new Date(now.getFullYear(), now.getMonth(), 1),
-        value: null,        // Date selezionata
-        min: null,          // Date
-        max: null,          // Date
-        disabledSet: new Set() // ISO yyyy-mm-dd
+
+        value: null,
+        min: null,
+        max: null,
+        disabledSet: new Set(), // ISO yyyy-mm-dd
+
+        // Filtri
+        experience: 'full',     // full | half | sunset
+        halfSlot: 'am',         // am | pm (per half)
+        availability: new Map(),// Map(iso -> Set(slots))
+        assumeAvailable: false
       };
     }
 
+    /* ================= Lifecycle ================= */
     connectedCallback(){
       this._render();
       this._readAll();
@@ -38,7 +52,7 @@
       this._updateUI();
     }
 
-    /* ========= Public API ========= */
+    /* ================= Public API ================= */
     get value(){ return this._state.value ? this._toISO(this._state.value) : ''; }
     set value(iso){
       const d = this._parseISO(iso);
@@ -48,8 +62,19 @@
         this._updateUI(true);
       }
     }
+    /** Imposta disponibilità da oggetto { iso: string[] } */
+    setAvailability(obj = {}, assumeAvailable = false){
+      const m = new Map();
+      for (const k of Object.keys(obj||{})){
+        const v = Array.isArray(obj[k]) ? new Set(obj[k]) : new Set();
+        m.set(k, v);
+      }
+      this._state.availability = m;
+      this._state.assumeAvailable = !!assumeAvailable;
+      this._updateUI();
+    }
 
-    /* ========= Internals ========= */
+    /* ================= Internals ================= */
     _qs = (s) => this.shadowRoot.querySelector(s);
 
     _readAll(){
@@ -75,9 +100,36 @@
       const list = this._parseDisabled(ddRaw);
       this._state.disabledSet = new Set(list.map(x => x));
 
+      // esperienza / slot
+      const exp = (g('experience')||'full').trim();
+      this._state.experience = ['full','half','sunset'].includes(exp) ? exp : 'full';
+      const hs = (g('half-slot')||'am').trim();
+      this._state.halfSlot = (hs==='pm') ? 'pm' : 'am';
+
+      // disponibilità
+      const avRaw = g('availability') || '';
+      const assume = (g('assume-available')||'false').toLowerCase()==='true';
+      this._state.assumeAvailable = assume;
+      this._state.availability = this._parseAvailability(avRaw);
+
       // inizializza il mese visibile
       const base = this._state.value || new Date();
       this._state.monthCursor = new Date(base.getFullYear(), base.getMonth(), 1);
+    }
+
+    _parseAvailability(raw){
+      if (!raw) return new Map();
+      try {
+        const o = JSON.parse(raw);
+        const m = new Map();
+        for (const k of Object.keys(o||{})){
+          const v = Array.isArray(o[k]) ? new Set(o[k]) : new Set();
+          m.set(String(k), v);
+        }
+        return m;
+      } catch(e){
+        return new Map();
+      }
     }
 
     _parseDisabled(raw){
@@ -111,10 +163,30 @@
 
     _isDisabled(d){
       const iso = this._toISO(d);
+      // filtri globali
       if (this._state.disabledSet.has(iso)) return true;
       if (this._state.min && d < this._stripTime(this._state.min)) return true;
       if (this._state.max && d > this._stripTime(this._state.max)) return true;
-      return false;
+
+      // logica disponibilità per filtro corrente
+      const {experience, halfSlot, availability, assumeAvailable} = this._state;
+
+      // slot richiesto
+      const need = experience === 'full'
+        ? 'full'
+        : experience === 'sunset'
+          ? 'sunset'
+          : (halfSlot === 'pm' ? 'half-pm' : 'half-am');
+
+      if (availability.size === 0) {
+        // se non è specificata disponibilità: abilita tutto solo se assumeAvailable
+        return !assumeAvailable;
+      }
+
+      const set = availability.get(iso);
+      if (!set) return true; // se il giorno non esiste nella mappa, non disponibile
+
+      return !set.has(need);
     }
 
     _stripTime(d){ return new Date(d.getFullYear(), d.getMonth(), d.getDate()); }
@@ -125,24 +197,77 @@
       this._updateUI();
     }
 
+    /* ================= UI wiring ================= */
     _mount(){
+      // nav mesi
       this._qs('#prev').addEventListener('click', () => this._shiftMonth(-1));
       this._qs('#next').addEventListener('click', () => this._shiftMonth( 1));
+
+      // filtri esperienza
+      this._qs('[data-exp="full"]').addEventListener('click', () => this._setExperience('full'));
+      this._qs('[data-exp="half"]').addEventListener('click', () => this._setExperience('half'));
+      this._qs('[data-exp="sunset"]').addEventListener('click', () => this._setExperience('sunset'));
+      this._qs('[data-slot="am"]').addEventListener('click', () => this._setHalfSlot('am'));
+      this._qs('[data-slot="pm"]').addEventListener('click', () => this._setHalfSlot('pm'));
+
+      // conferma
       this._qs('#confirm').addEventListener('click', () => {
         if (!this._state.value) return;
         this.dispatchEvent(new CustomEvent('confirm', {
-          detail: { date: this._toISO(this._state.value) },
+          detail: { 
+            date: this._toISO(this._state.value),
+            experience: this._state.experience,
+            slot: this._state.experience==='half' ? this._state.halfSlot : null
+          },
           bubbles: true, composed: true
         }));
       });
     }
 
+    _setExperience(exp){
+      if (!['full','half','sunset'].includes(exp)) return;
+      this._state.experience = exp;
+      // se passo a half e non ho slot, default AM
+      if (exp === 'half' && !['am','pm'].includes(this._state.halfSlot)) {
+        this._state.halfSlot = 'am';
+      }
+      this.dispatchEvent(new CustomEvent('filter-change', {
+        detail: { experience: this._state.experience, slot: this._state.halfSlot },
+        bubbles:true, composed:true
+      }));
+      this._updateUI();
+    }
+
+    _setHalfSlot(slot){
+      if (!['am','pm'].includes(slot)) return;
+      this._state.halfSlot = slot;
+      if (this._state.experience !== 'half') this._state.experience = 'half';
+      this.dispatchEvent(new CustomEvent('filter-change', {
+        detail: { experience: this._state.experience, slot: this._state.halfSlot },
+        bubbles:true, composed:true
+      }));
+      this._updateUI();
+    }
+
     _updateUI(scrollIntoView=false){
-      const {monthCursor, locale, startOn, value} = this._state;
+      const {monthCursor, locale, startOn, value, experience, halfSlot} = this._state;
 
       // intestazione mese (minuscolo come Airbnb: “ottobre 2025”)
       const monthFmt = new Intl.DateTimeFormat(locale, { month:'long', year:'numeric' });
       this._qs('#monthLabel').textContent = monthFmt.format(monthCursor).toLocaleLowerCase();
+
+      // etichetta filtro
+      const label = experience === 'full'
+        ? 'Full Day · tutto il giorno'
+        : experience === 'sunset'
+          ? 'Gourmet Sunset Cruise · 18:30–23:00'
+          : (halfSlot === 'pm' ? 'Half Day · 14:00–18:00' : 'Half Day · 09:00–13:00');
+      this._qs('#filterLabel').textContent = label;
+
+      // stato pulsanti filtro
+      this._qsAll('[data-exp]').forEach(el => el.classList.toggle('is-active', el.dataset.exp === experience));
+      this._qs('#halfRow').style.display = (experience === 'half') ? 'flex' : 'none';
+      this._qsAll('[data-slot]').forEach(el => el.classList.toggle('is-active', el.dataset.slot === halfSlot));
 
       // labels giorni
       const fmt = new Intl.DateTimeFormat(locale, { weekday:'short' });
@@ -166,6 +291,7 @@
       }
     }
 
+    _qsAll = (s) => Array.from(this.shadowRoot.querySelectorAll(s));
     _shortWeek(w){ return w.replace('.', '').slice(0,3); } // “lun, mar, mer…”
 
     _buildMonthMatrix(){
@@ -232,7 +358,11 @@
           if (!this._isDisabled(d)){
             this._state.value = d;
             this.dispatchEvent(new CustomEvent('change', {
-              detail: { date: this._toISO(d) },
+              detail: { 
+                date: this._toISO(d),
+                experience: this._state.experience,
+                slot: this._state.experience==='half' ? this._state.halfSlot : null
+              },
               bubbles: true, composed: true
             }));
           }
@@ -247,33 +377,55 @@
       this.shadowRoot.innerHTML = `
         <style>
           :host{
-            /* Font principale richiesto */
             font-family:"Plus Jakarta Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
             display:block;
-            color:#fff; /* testo di default bianco */
+            color:#fff; /* numeri/etichette bianchi */
             width:min(720px, 96vw);
-            background:transparent; /* richiesto */
+            background:transparent;
           }
-
-          /* carica il font all'interno dello Shadow DOM */
           @import url("https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap");
 
-          .cal{
-            background:transparent; /* nessun pannello */
-            border:none;
-            border-radius:12px;
+          /* forza il font in tutto lo shadow */
+          * { font-family: "Plus Jakarta Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif !important; }
+
+          .cal{ background:transparent; border:none; border-radius:12px; }
+
+          /* ===== Filtro esperienza ===== */
+          .filters{
+            display:flex; flex-direction:column; gap:8px; padding:6px 4px 4px;
+          }
+          .seg{
+            display:flex; gap:6px; flex-wrap:wrap;
+          }
+          .chip{
+            border:1px solid rgba(255,255,255,.28);
+            color:#fff;
+            background:transparent;
+            border-radius:999px;
+            padding:6px 10px;
+            font-size:13px; font-weight:700;
+            cursor:pointer;
+            transition:background .15s ease, color .15s ease, border-color .15s ease, transform .06s ease;
+          }
+          .chip:hover{ background:rgba(255,255,255,.10); }
+          .chip.is-active{
+            background:#fff; color:#111; border-color:transparent;
+          }
+          .subseg{
+            display:flex; gap:6px; align-items:center; padding-left:2px;
+          }
+          .subseg .chip{ padding:6px 8px; font-weight:700; }
+
+          .filterLabel{
+            color:rgba(255,255,255,.65); font-size:12px; font-weight:600; letter-spacing:.2px;
           }
 
+          /* ===== Header mese ===== */
           .head{
             display:flex; align-items:center; justify-content:space-between; gap:12px;
-            padding:10px 6px 12px;
+            padding:10px 6px 8px;
           }
-          .title{ 
-            font-weight:700; 
-            text-transform:lowercase; 
-            font-size:16px; 
-            letter-spacing:.2px; 
-          }
+          .title{ font-weight:700; text-transform:lowercase; font-size:16px; letter-spacing:.2px; }
           .nav{ display:flex; gap:6px; align-items:center; }
           .nav .nav-btn{
             height:28px; width:28px; border-radius:14px;
@@ -285,12 +437,13 @@
           .nav .nav-btn:hover{ background:rgba(255,255,255,.22); }
           .nav .nav-btn:active{ background:rgba(255,255,255,.28); }
 
+          /* ===== Grid giorni ===== */
           .dow, .grid{
             display:grid; grid-template-columns:repeat(7, 1fr);
             text-align:center;
           }
           .dow{ 
-            padding:0 4px 8px; 
+            padding:2px 4px 8px; 
             color:rgba(255,255,255,.55); 
             font-size:12px; 
             font-weight:600; 
@@ -304,7 +457,7 @@
             height:34px; width:34px; margin:auto;
             border-radius:50%;
             background:transparent; 
-            color:#fff;              /* numeri bianchi richiesti */
+            color:#fff;
             display:grid; place-items:center;
             font-size:14px; font-weight:700;
             cursor:pointer;
@@ -312,34 +465,46 @@
             transition: background .15s ease, color .15s ease, transform .1s ease;
           }
           .day:hover{ background:rgba(255,255,255,.10); }
-          .day.is-out{ color:rgba(255,255,255,.38); }        /* giorni fuori mese in grigio/bianco tenue */
-          .day.is-dis{ color:rgba(255,255,255,.18); cursor:not-allowed; } /* molto trasparenti */
+          .day.is-out{ color:rgba(255,255,255,.38); }
+          .day.is-dis{ color:rgba(255,255,255,.18); cursor:not-allowed; }
           .day.is-today{ box-shadow:inset 0 0 0 1px rgba(255,255,255,.45); }
 
-          /* Selezione richiesta: sfondo bianco, testo scuro */
           .day.is-selected{
             background:#fff; 
             color:#111; 
             font-weight:800;
           }
-* {
-  font-family: 'Plus Jakarta Sans' !important;
-}
+
           .foot{
-            display:flex; justify-content:center; padding:10px 0 0;
-            border-top:none;
+            display:flex; justify-content:center; padding:8px 0 0;
           }
           .confirm-btn{
             height:36px; padding:0 14px; border-radius:10px;
             border:1px solid rgba(255,255,255,.25);
             color:#fff; background:transparent; cursor:pointer;
-            font-weight:700;
+            font-weight:800;
           }
           .confirm-btn[disabled]{ opacity:.35; cursor:not-allowed; }
           .confirm-btn:not([disabled]):hover{ background:rgba(255,255,255,.10); }
         </style>
 
         <div class="cal">
+          <!-- FILTRI -->
+          <div class="filters">
+            <div class="seg">
+              <button class="chip" data-exp="full" type="button">Full Day</button>
+              <button class="chip" data-exp="half" type="button">Half Day</button>
+              <button class="chip" data-exp="sunset" type="button">Gourmet Sunset Cruise</button>
+            </div>
+            <div id="halfRow" class="subseg" style="display:none">
+              <span class="filterLabel">Seleziona fascia:</span>
+              <button class="chip" data-slot="am" type="button">09:00–13:00</button>
+              <button class="chip" data-slot="pm" type="button">14:00–18:00</button>
+            </div>
+            <div class="filterLabel" id="filterLabel"></div>
+          </div>
+
+          <!-- INTESTAZIONE MESE -->
           <div class="head">
             <div class="title">
               <span id="monthLabel">mese anno</span>
@@ -350,12 +515,14 @@
             </div>
           </div>
 
+          <!-- GRIGLIA -->
           <div class="dow" aria-hidden="true"></div>
           <div class="grid" role="grid" aria-label="Calendario selezione giorno"></div>
 
+          <!-- FOOTER -->
           <div class="foot">
             <button id="confirm" class="confirm-btn" type="button" disabled>
-              Conferma data
+              Conferma
             </button>
           </div>
         </div>
