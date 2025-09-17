@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <link rel="icon" href="./favicon.ico" type="image/x-icon">
+  <link rel="apple-touch-icon" href="./apple-touch-icon.png">
+
+
+  <title>Leggero Tours — Progress Form</title>
+
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Petrona:wght@400;700&family=Plus+Jakarta+Sans:wght@400;700&display=swap" rel="stylesheet">
+
+  <!-- Tokens e CSS pagina -->
+  <link rel="stylesheet" href="./system/atoms/tokens.css">
+  <link rel="stylesheet" href="./index.css">
+
+  <!-- Componenti (ordine: dipendenze -> chi li usa) -->
+  <script src="./system/blocks/ds-button.js" defer></script>
+  <script src="./system/blocks/story-badge.js" defer></script>
+  <script src="./system/blocks/experience-card.js" defer></script>
+  <script src="./system/blocks/experiences-gallery.js" defer></script>
+  <script src="./system/blocks/review-card.js" defer></script>
+  <script src="./system/blocks/reviews-gallery.js" defer></script>
+  <script src="./system/blocks/booking-ticket.js" defer></script>
+  <script src="./system/blocks/booking-calendar.js" defer></script>
+  <script src="./system/blocks/my-title.js" defer></script>
+  <script src="./system/blocks/my-list.js" defer></script>
+</head>
+<body>
+<my-title 
+  title="La rotta" 
+  subtitle="Scopri cosa faremo durante il giorno">
+</my-title>
+
+<div class="list-wrapper" style="display:flex; flex-direction: column; gap: 1rem;">
+<my-list>
+  <img slot="image" src="./assets/images/couscous.jpg" alt="Bussola">
+  <h3 slot="title" class="title">Breakfast by the sea swing</h3>
+  <p slot="description" class="desc">Gustati un cornetto in stile dolce vita a punta chiappa</p>
+  <span slot="tag" class="tag">2 ore</span>
+</my-list>
+<my-list>
+  <img slot="image" src="./assets/images/cornetto.jpg" alt="Bussola">
+  <h3 slot="title" class="title">Breakfast by the sea swing</h3>
+  <p slot="description" class="desc">Gustati un cornetto in stile dolce vita a punta chiappa</p>
+  <span slot="tag" class="tag">2 ore</span>
+</my-list>
+<my-list>
+  <img slot="image" src="./assets/images/simo.jpg" alt="Bussola">
+  <h3 slot="title" class="title">Breakfast by the sea swing</h3>
+  <p slot="description" class="desc">Gustati un cornetto in stile dolce vita a punta chiappa</p>
+  <span slot="tag" class="tag">2 ore</span>
+</my-list>
+<my-list>
+  <img slot="image" src="./assets/images/cornetto.jpg" alt="Bussola">
+  <h3 slot="title" class="title">Breakfast by the sea swing</h3>
+  <p slot="description" class="desc">Gustati un cornetto in stile dolce vita a punta chiappa</p>
+  <span slot="tag" class="tag">2 ore</span>
+</my-list>
+<my-list>
+  <img slot="image" src="./assets/images/cornetto.jpg" alt="Bussola">
+  <h3 slot="title" class="title">Breakfast by the sea swing</h3>
+  <p slot="description" class="desc">Gustati un cornetto in stile dolce vita a punta chiappa</p>
+  <span slot="tag" class="tag">2 ore</span>
+</my-list>
+</body>
+</html>

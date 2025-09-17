@@ -67,7 +67,7 @@
             font-family:system-ui, sans-serif; box-shadow:0 10px 30px rgba(0,0,0,.35);
             will-change: transform;
             aspect-ratio:9/16;
-            width: 240px;
+            width: 260px;
           }
 * {
   font-family: 'Plus Jakarta Sans' !important;

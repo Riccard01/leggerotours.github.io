@@ -25,18 +25,46 @@
   <script src="./system/blocks/reviews-gallery.js" defer></script>
   <script src="./system/blocks/booking-ticket.js" defer></script>
   <script src="./system/blocks/booking-calendar.js" defer></script>
+  <script src="./system/blocks/my-list.js" defer></script>
 </head>
 <body>
 
-<!-- EXPERIENCES / hero -->
- <img src="assets/images/knot.png" alt="" style="scale: .13; margin-top: -12rem; margin-bottom: -8rem; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">
 
 
-<!-- La gallery -->
+
+
+  <!-- La gallery -->
+<img src="assets/images/knot.png" alt="" style="scale: .13; margin-top: -12rem; margin-bottom: -8rem;">
 <experiences-gallery></experiences-gallery>
 
+<!-- Perks List -->
+<my-list>
+  <img slot="image" src="./assets/images/fuel.png" alt="Bussola">
+  <h3 slot="title" class="title">Fuel Included</h3>
+  <p slot="description" class="desc">No extra surprises</p>
+  <span slot="tag" class="tag">2 ore</span>
+  <!-- azioni opzionali -->
+  <!-- <ds-button slot="action" variant="overlay" size="sm"><span slot="text">Dettagli</span></ds-button> -->
+</my-list>
+<my-list>
+  <img slot="image" src="./assets/images/mask.png" alt="Bussola">
+  <h3 slot="title" class="title">Snorkeling gear</h3>
+  <p slot="description" class="desc">No extra surprises</p>
+  <span slot="tag" class="tag">2 ore</span>
+  <!-- azioni opzionali -->
+  <!-- <ds-button slot="action" variant="overlay" size="sm"><span slot="text">Dettagli</span></ds-button> -->
+</my-list>
+<my-list>
+  <img slot="image" src="./assets/images/fuel.png" alt="Bussola">
+  <h3 slot="title" class="title">Fuel Included</h3>
+  <p slot="description" class="desc">No extra surprises</p>
+  <span slot="tag" class="tag">2 ore</span>
+  <!-- azioni opzionali -->
+  <!-- <ds-button slot="action" variant="overlay" size="sm"><span slot="text">Dettagli</span></ds-button> -->
+</my-list>
+
 <!-- REVIEWS -->
-<img src="assets/images/knot.png" alt="" style="scale: .13; margin-top: -3rem; margin-bottom: -8rem; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">
+<img src="assets/images/knot.png" alt="" style="scale: .13; margin-top: -3rem; margin-bottom: -8rem;">
 <section class="reviews-section">
   <div class="background">
     <div class="container">

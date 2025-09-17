@@ -84,6 +84,7 @@
             --exit-dur:  ${EXIT_DUR}ms;
             --stagger:   ${STAGGER}ms;
 
+            z-index: 1;
             display: block;
             width: 100%;
             box-sizing: border-box;
@@ -176,7 +177,7 @@
 
           /* Dots pagination (minimal) */
           .dots{
-            position: absolute; left: 0; right: 0; bottom: 48px;
+            position: absolute; left: 0; right: 0; bottom: 80px; z-index: 10;
             display: flex; justify-content: center; gap: 8px;
             pointer-events: none;
           }
