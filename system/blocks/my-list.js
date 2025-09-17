@@ -16,7 +16,7 @@
           /* contenitore delle righe */
           .list {
             display: flex;
-            flex-wrap: wrap;
+            flex-direction: column;
             gap: var(--row-gap, 12px);
             padding: 0;
             margin: 0 1rem;
