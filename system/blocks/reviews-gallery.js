@@ -47,7 +47,7 @@
               transform .15s cubic-bezier(.2,.8,.2,1) !important,
               opacity .15s !important;
             transform: translateY(36px) scale(.9);
-            opacity:.8;
+            opacity:1;
             z-index:1;
           }
 
@@ -59,11 +59,11 @@
           /* vicine alla principale */
           .row > review-card[data-pos="left"]{
             transform: translateY(24px) rotate(-6deg) scale(.9);
-            z-index:2; opacity:.9;
+            z-index:2; opacity:1;
           }
           .row > review-card[data-pos="right"]{
             transform: translateY(24px) rotate(6deg) scale(.9);
-            z-index:2; opacity:.9;
+            z-index:2; opacity:1;
           }
 
           /* attiva */
@@ -94,16 +94,33 @@
             tag="Super raccomandato"
             avatar="./assets/images/avatar2.jpg">
           </review-card>
+          
+          <review-card
+            image="./assets/images/Linda.jpg"
+            title="Linda"
+            description="Un tour indimenticabile, dal primo all’ultimo minuto. Consigliatissimo a chi vuole scoprire la Liguria dal mare."
+            tag="Da rifare"
+            avatar="./assets/images/avatar3.jpg">
+          </review-card>
 
           <review-card
             image="./assets/images/simo.jpg"
             title="Simone"
             description="Un tour indimenticabile, dal primo all’ultimo minuto. Consigliatissimo a chi vuole scoprire la Liguria dal mare."
             tag="Da rifare"
+            platform-logo="./assets/images/google.png"
+            platform-alt="Recensione su Google">
+          </review-card>
+
+            
+          <review-card
+            image="./assets/images/giulix.jpg"
+            title="Giulia"
+            description="Un tour indimenticabile, dal primo all’ultimo minuto. Consigliatissimo a chi vuole scoprire la Liguria dal mare."
+            tag="Da rifare"
             avatar="./assets/images/avatar3.jpg">
           </review-card>
 
-          
           <review-card
             image="./assets/images/tipo.jpg"
             title="Ahmed"
@@ -128,13 +145,6 @@
             avatar="./assets/images/avatar3.jpg">
           </review-card>
 
-          <review-card
-            image="./assets/images/me.jpg"
-            title="Melyssa"
-            description="Un tour indimenticabile, dal primo all’ultimo minuto. Consigliatissimo a chi vuole scoprire la Liguria dal mare."
-            tag="Da rifare"
-            avatar="./assets/images/avatar3.jpg">
-          </review-card>
 
           <div class="spacer" aria-hidden="true"></div>
         </div>

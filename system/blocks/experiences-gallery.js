@@ -44,6 +44,14 @@
           { id:'gourmet', title:'Gourmet Sunset',   price:'€390 per group', img:'./assets/images/genovese.jpg',    desc:'Tramonto con degustazione a bordo.' },
           { id:'stella',  title:'Stella Maris',     price:'€1200 per group',img:'./assets/images/special.jpg',     desc:'Camogli e San Fruttuoso con aperitivo.' },
           { id:'firew',   title:'Recco Fireworks',  price:'€1200 per group',img:'./assets/images/fireworks.jpg',   desc:'Notte di fuochi dal mare.' },
+
+          { id:'Boccadasse',   title:'Boccadasse',  price:'€1200 per group',img:'./assets/images/boccadasse.jpeg',   desc:'Notte di fuochi dal mare.' },
+          { id:'Bogliasco',   title:'Bogliasco',  price:'€1200 per group',img:'./assets/images/bogliasco.jpg',   desc:'Notte di fuochi dal mare.' },
+          { id:'Sori',   title:'Sori',  price:'€1200 per group',img:'./assets/images/sori.jpg',   desc:'Notte di fuochi dal mare.' },
+          { id:'Recco',   title:'Recco',  price:'€1200 per group',img:'./assets/images/recco.jpg',   desc:'Notte di fuochi dal mare.' },
+          { id:'Camogli',   title:'Camogli',  price:'€1200 per group',img:'./assets/images/camogli.jpg',   desc:'Notte di fuochi dal mare.' },
+          { id:'San Fruttuoso',   title:'San Fruttuoso',  price:'€1200 per group',img:'./assets/images/sanfru.webp',   desc:'Notte di fuochi dal mare.' },
+          { id:'Portofino',   title:'Portofino',  price:'€1200 per group',img:'./assets/images/portofino.webp',   desc:'Notte di fuochi dal mare.' },
         ],
         barca: [
           { id:'gozzo',  title:'Leggera',        price:'Incluso',  img:'./assets/images/leggera.jpg',  desc:'Classico e confortevole.' },
