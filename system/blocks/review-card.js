@@ -131,7 +131,7 @@
           }
           .platform-badge img{
             display:block; width:100%; height:100%; object-fit:contain;
-            filter: drop-shadow(0 1px 2px rgba(0,0,0,.25));
+            filter: drop-shadow(0 1px 2px rgba  (0,0,0,.25));
           }
         </style>
 
