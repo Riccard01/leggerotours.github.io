@@ -31,6 +31,8 @@
 <body>
 
 
+<button id="leggiCella">Leggi cella dal foglio</button>
+<div id="risultato"></div>
 
 
 
@@ -309,6 +311,29 @@ And the boat was very safe, he had all of the safety equipments ready if anythin
 
 </script>
 
+<script>
+  // URL del tuo Google Apps Script pubblicato
+  const sheetURL =
+    "https://script.google.com/macros/s/AKfycbwlBH9uELf8EOwMP5eqJoZZnsogMZgNbhxMU64LG2DhousYKDW3AkYMFmVMfH0pWlOHTw/exec";
+
+  // Quando l'utente clicca il pulsante
+  document.getElementById("leggiCella").addEventListener("click", async () => {
+    const cella = "D15"; // Cambia con la cella che vuoi leggere
+
+    try {
+      const res = await fetch(`${sheetURL}&cell=${cella}`);
+      const data = await res.json();
+
+      console.log(`📊 Valore della cella ${cella}:`, data.value);
+
+      // Se vuoi anche mostrarlo nella pagina:
+      const output = document.getElementById("risultato");
+      if (output) output.textContent = `Valore di ${cella}: ${data.value}`;
+    } catch (err) {
+      console.error("❌ Errore durante la lettura del foglio:", err);
+    }
+  });
+</script>
 
 </body>
 </html>
